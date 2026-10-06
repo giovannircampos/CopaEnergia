@@ -445,21 +445,21 @@
         </div>
     </div>
 
-    <!-- MODAL 4: CANCELAMENTO / EXCLUSÃO AUDITADA -->
+    <!-- MODAL 4: CANCELAMENTO AUDITADO -->
     <div id="modalCancelarReserva" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-rose-600">
             <h3 class="text-base font-bold text-copa-teal mb-2 flex items-center gap-2">
                 <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600"></i>
-                Excluir / Cancelar Registo
+                Cancelar Agendamento
             </h3>
             <p class="text-xs text-slate-600 mb-4" id="textoAvisoCancelamento">
-                Informe o motivo para registo no histórico de auditoria da Copa Energia.
+                Informe o motivo para registro de auditoria na Copa Energia.
             </p>
 
             <div class="space-y-3 text-xs mb-4">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Motivo da Exclusão / Cancelamento *</label>
-                    <input type="text" id="inputMotivoCancelamento" placeholder="Ex: Limpeza de histórico / Reunião cancelada" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                    <label class="block font-semibold text-slate-700 mb-1">Motivo do Cancelamento *</label>
+                    <input type="text" id="inputMotivoCancelamento" placeholder="Ex: Reunião reagendada pelo solicitante" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-rose-500 focus:outline-none">
                 </div>
             </div>
 
@@ -468,7 +468,7 @@
                     Voltar
                 </button>
                 <button onclick="confirmarCancelamentoModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2.5 rounded-lg text-xs shadow-sm">
-                    Confirmar Exclusão
+                    Confirmar Cancelamento
                 </button>
             </div>
         </div>
@@ -493,7 +493,7 @@
                         <tr>
                             <th class="p-2.5">Horário/Data</th>
                             <th class="p-2.5">Reservado Por</th>
-                            <th class="p-2.5">Excluído Por</th>
+                            <th class="p-2.5">Cancelado Por</th>
                             <th class="p-2.5">Motivo</th>
                             <th class="p-2.5">Data da Ação</th>
                         </tr>
@@ -635,7 +635,7 @@
             renderTabela();
         }
 
-        // AGENDAMENTO EM BLOCO (BLOQUEIA DIAS PASSADOS E HORÁRIOS JÁ DECORRIDOS HOJE)
+        // AGENDAMENTO EM BLOCO
         function abrirModalNovaReserva(horarioInicioSugerido) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -837,7 +837,7 @@
             document.getElementById('modalSucessoReserva').classList.add('hidden');
         }
 
-        // CANCELAMENTO / EXCLUSÃO AUDITADA
+        // CANCELAMENTO AUDITADO
         function abrirModalCancelarSlot(horario) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -856,7 +856,7 @@
         function confirmarCancelamentoModal() {
             const motivo = document.getElementById('inputMotivoCancelamento').value.trim();
             if (!motivo) {
-                alert('Por favor, escreva o motivo para alteração do registo.');
+                alert('Por favor, escreva o motivo do cancelamento.');
                 return;
             }
 
@@ -882,7 +882,7 @@
             }
 
             fecharModalCancelar();
-            alert('Ação registrada no histórico de auditoria com sucesso.');
+            alert('Cancelamento registrado no histórico de auditoria.');
         }
 
         function obterHorarioAtualHHMM() {
@@ -969,6 +969,13 @@
                     : '';
 
                 if (reserva) {
+                    // SE A REUNIÃO JÁ TERMINOU (PASSADO): NÃO EXIBE O BOTÃO EXCLUIR
+                    const botaoAcaoReserva = passado 
+                        ? `<span class="text-slate-400 text-[10px] font-bold uppercase">Concluído</span>`
+                        : `<button onclick="abrirModalCancelarSlot('${horario}')" class="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Cancelar
+                           </button>`;
+
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-copa-teal bg-orange-50/40">
                             ${horario}
@@ -987,9 +994,7 @@
                             ${reserva.assunto}
                         </td>
                         <td class="py-2.5 px-3 border border-slate-200 text-center no-print">
-                            <button onclick="abrirModalCancelarSlot('${horario}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors border border-slate-300">
-                                <i data-lucide="trash-2" class="w-3.5 h-3.5 text-rose-600"></i> Excluir
-                            </button>
+                            ${botaoAcaoReserva}
                         </td>
                     `;
                 } else if (passado) {
@@ -997,11 +1002,11 @@
                         <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-slate-400 bg-slate-100">
                             ${horario}
                         </td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">Livre (Encerrado)</td>
+                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">Encerrado</td>
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
                         <td class="py-2.5 px-3 border border-slate-200 text-center no-print">
-                            <span class="text-slate-400 text-[10px] font-bold uppercase">-</span>
+                            <span class="text-slate-400 text-[10px] font-bold uppercase">Encerrado</span>
                         </td>
                     `;
                 } else {
