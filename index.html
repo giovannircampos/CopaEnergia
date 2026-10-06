@@ -109,7 +109,7 @@
                     <i data-lucide="sliders" class="w-5 h-5 text-copa-orange"></i>
                     Painel de Gerenciamento da Sala
                 </h2>
-                <p class="text-xs text-slate-500">Navegação por data e agendamento corporativo em bloco.</p>
+                <p class="text-xs text-slate-500">Navegação por data (dias atuais e futuros) e agendamento em bloco.</p>
             </div>
             <div class="flex flex-wrap gap-2">
                 <button onclick="abrirModalNovaReserva()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
@@ -364,7 +364,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: AGENDAMENTO DE HORÁRIO / BLOCO DE HORÁRIOS (APENAS LIVRES) -->
+    <!-- MODAL 2: AGENDAMENTO DE HORÁRIO / BLOCO DE HORÁRIOS -->
     <div id="modalNovaReserva" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-copa-orange">
             <div class="flex justify-between items-center mb-4">
@@ -635,7 +635,7 @@
             renderTabela();
         }
 
-        // AGENDAMENTO EM BLOCO
+        // AGENDAMENTO EM BLOCO (BLOQUEIA DIAS PASSADOS E HORÁRIOS JÁ DECORRIDOS HOJE)
         function abrirModalNovaReserva(horarioInicioSugerido) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -643,11 +643,19 @@
             }
 
             const chaveData = getDataAtualChave();
+            const hojeData = new Date().toISOString().split('T')[0];
+
+            if (chaveData < hojeData) {
+                alert('Não é possível realizar agendamentos em datas passadas.');
+                return;
+            }
+
             const reservasHoje = reservas[chaveData] || {};
 
             const selInicio = document.getElementById('selectHoraInicio');
             selInicio.innerHTML = '';
 
+            // Filtra slots não reservados e não decorridos no dia atual
             const slotsLivres = horarios.filter(h => {
                 const chaveHorario = h.replace(':', 'h');
                 const jaReservado = !!reservasHoje[chaveHorario];
@@ -726,6 +734,12 @@
             const hInicio = document.getElementById('selectHoraInicio').value;
             const hFim = document.getElementById('selectHoraFim').value;
             const chaveData = getDataAtualChave();
+            const hojeData = new Date().toISOString().split('T')[0];
+
+            if (chaveData < hojeData) {
+                alert('Não é possível realizar agendamentos em datas passadas.');
+                return;
+            }
 
             if (!assunto) {
                 alert('Por favor, informe o assunto ou projeto da reunião.');
@@ -879,11 +893,13 @@
             return `${h}:${m}`;
         }
 
+        // VALIDAÇÃO RIGOROSA: Dias passados são bloqueados. Dias futuros são liberados.
         function ehHorarioPassado(horarioString, dataChave) {
             const hojeData = new Date().toISOString().split('T')[0];
-            if (dataChave < hojeData) return true;
-            if (dataChave > hojeData) return false;
+            if (dataChave < hojeData) return true;  // Dias passados = bloqueados
+            if (dataChave > hojeData) return false; // Dias futuros = totalmente liberados
 
+            // Dia de hoje = valida hora atual
             const agoraHHMM = obterHorarioAtualHHMM();
             const fimSlot = horarioString.split(' - ')[1];
             return agoraHHMM >= fimSlot;
@@ -1055,13 +1071,17 @@
         }
 
         function atualizarData() {
-            const dataInput = document.getElementById('inputData').value;
-            if (dataInput) {
-                const [ano, mes, dia] = dataInput.split('-');
-                document.getElementById('displayData').innerText = `${dia}/${mes}/${ano}`;
-            } else {
-                document.getElementById('displayData').innerText = '___ / ___ / ______';
+            const dataInput = document.getElementById('inputData');
+            const hojeData = new Date().toISOString().split('T')[0];
+
+            // Se o usuário forçar uma data anterior via teclado, reseta para hoje
+            if (dataInput.value && dataInput.value < hojeData) {
+                dataInput.value = hojeData;
             }
+
+            const dataFinal = dataInput.value || hojeData;
+            const [ano, mes, dia] = dataFinal.split('-');
+            document.getElementById('displayData').innerText = `${dia}/${mes}/${ano}`;
             renderTabela();
         }
 
@@ -1095,8 +1115,12 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             const hoje = new Date().toISOString().split('T')[0];
-            document.getElementById('inputData').value = hoje;
-            
+            const inputDataElem = document.getElementById('inputData');
+
+            // Define a data inicial como hoje e limita o mínimo no seletor para hoje
+            inputDataElem.value = hoje;
+            inputDataElem.min = hoje;
+
             atualizarData();
             atualizarHeaderUsuario();
             inicializarFirebaseListeners();
