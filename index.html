@@ -33,11 +33,6 @@
     </script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- SDKs do Firebase v9 (Compatibilidade Web) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
@@ -61,26 +56,6 @@
 </head>
 <body class="bg-copa-grayBg min-h-screen text-slate-800 p-4 md:p-8">
 
-    <!-- CONFIGURAÇÃO E CONEXÃO COM O FIREBASE -->
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCLHXj24INoj1AaRqf2mS9DjU3lTE0bFE4",
-            authDomain: "copaenergia-agendamento.firebaseapp.com",
-            databaseURL: "https://copaenergia-agendamento-default-rtdb.firebaseio.com",
-            projectId: "copaenergia-agendamento",
-            storageBucket: "copaenergia-agendamento.firebasestorage.app",
-            messagingSenderId: "464924217765",
-            appId: "1:464924217765:web:c30961ed28a18df4cd584c",
-            measurementId: "G-97TR7TZ7J4"
-        };
-
-        // Inicializar Firebase Realtime Database
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const refReservas = db.ref('copa_reservas');
-        const refLogs = db.ref('copa_logs_cancelamento');
-    </script>
-
     <!-- Header do Usuário Logado -->
     <div class="no-print max-w-4xl mx-auto mb-4 bg-copa-teal text-white p-4 rounded-xl shadow-md flex flex-wrap items-center justify-between gap-4 border-l-4 border-copa-orange">
         <div class="flex items-center gap-3">
@@ -88,6 +63,7 @@
             <div class="w-10 h-10 flex items-center justify-center bg-white rounded-lg p-1.5 shadow-sm">
                 <svg viewBox="0 0 100 100" class="w-full h-full">
                     <g transform="translate(50,50)">
+                        <!-- 10 Pétalas espiraladas em sentido horário -->
                         <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" />
                         <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" transform="rotate(36)" />
                         <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" transform="rotate(72)" />
@@ -383,24 +359,9 @@
             "17:00 - 17:30", "17:30 - 18:00"
         ];
 
-        let reservas = {};
-        let logsCancelamento = [];
+        let reservas = JSON.parse(localStorage.getItem('copa_reservas')) || {};
+        let logsCancelamento = JSON.parse(localStorage.getItem('copa_logs_cancelamento')) || [];
         let usuarioSessao = JSON.parse(localStorage.getItem('copa_usuario_atual')) || null;
-
-        // OUVINTES EM TEMPO REAL DO FIREBASE
-        function inicializarFirebaseListeners() {
-            // Escutar agendamentos em tempo real
-            refReservas.on('value', (snapshot) => {
-                reservas = snapshot.val() || {};
-                renderTabela();
-            });
-
-            // Escutar histórico de cancelamentos em tempo real
-            refLogs.on('value', (snapshot) => {
-                const data = snapshot.val() || {};
-                logsCancelamento = Object.values(data).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            });
-        }
 
         function solicitarIdentificacao() {
             document.getElementById('modalIdentificacao').classList.remove('hidden');
@@ -446,16 +407,18 @@
             if (assunto === null) return;
 
             const chaveData = getDataAtualChave();
+            if (!reservas[chaveData]) reservas[chaveData] = {};
 
-            // Salva diretamente no Firebase Realtime Database
-            refReservas.child(chaveData).child(horario.replace(':', 'h')).set({
-                horarioOriginal: horario,
+            reservas[chaveData][horario] = {
                 responsavel: usuarioSessao.nome,
                 setor: usuarioSessao.setor || '-',
                 assunto: assunto || 'Reunião Geral',
                 criadoPor: usuarioSessao.nome,
                 criadoEm: new Date().toLocaleString('pt-BR')
-            });
+            };
+
+            localStorage.setItem('copa_reservas', JSON.stringify(reservas));
+            renderTabela();
         }
 
         function cancelarSlot(horario) {
@@ -465,8 +428,7 @@
             }
 
             const chaveData = getDataAtualChave();
-            const chaveHorario = horario.replace(':', 'h');
-            const reservaAtual = reservas[chaveData]?.[chaveHorario];
+            const reservaAtual = reservas[chaveData]?.[horario];
 
             if (!reservaAtual) return;
 
@@ -480,22 +442,23 @@
             const motivo = prompt("Digite o motivo do cancelamento para registro de auditoria:");
             if (motivo === null) return;
 
-            // Registrar log no Firebase
-            refLogs.push({
+            logsCancelamento.unshift({
                 dataReuniao: chaveData,
                 horario: horario,
                 reservadoPor: reservaAtual.responsavel,
                 canceladoPor: usuarioSessao.nome,
                 setorCancelador: usuarioSessao.setor || '-',
                 motivo: motivo || 'Sem motivo informado',
-                dataAcao: new Date().toLocaleString('pt-BR'),
-                timestamp: new Date().toISOString()
+                dataAcao: new Date().toLocaleString('pt-BR')
             });
 
-            // Remover do Firebase Realtime Database
-            refReservas.child(chaveData).child(chaveHorario).remove();
+            delete reservas[chaveData][horario];
+            
+            localStorage.setItem('copa_reservas', JSON.stringify(reservas));
+            localStorage.setItem('copa_logs_cancelamento', JSON.stringify(logsCancelamento));
 
             alert(`Agendamento cancelado e registrado no histórico de auditoria da Copa Energia.`);
+            renderTabela();
         }
 
         function renderTabela() {
@@ -506,8 +469,7 @@
 
             horarios.forEach((horario, index) => {
                 const tr = document.createElement('tr');
-                const chaveHorario = horario.replace(':', 'h');
-                const reserva = reservasHoje[chaveHorario];
+                const reserva = reservasHoje[horario];
                 tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
 
                 if (reserva) {
@@ -610,7 +572,6 @@
             atualizarCabecalho();
             atualizarData();
             atualizarHeaderUsuario();
-            inicializarFirebaseListeners();
 
             if (!usuarioSessao) {
                 solicitarIdentificacao();
