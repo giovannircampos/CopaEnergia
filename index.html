@@ -69,7 +69,7 @@
         const refLogs = db.ref('copa_logs_cancelamento');
     </script>
 
-    <!-- Header do Usuário -->
+    <!-- Header do Usuário / Sessão -->
     <div class="no-print max-w-4xl mx-auto mb-4 bg-copa-teal text-white p-4 rounded-xl shadow-md flex flex-wrap items-center justify-between gap-4 border-l-4 border-copa-orange">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 flex items-center justify-center bg-white rounded-lg p-1.5 shadow-sm">
@@ -93,13 +93,15 @@
                 <span id="labelUsuarioAtual" class="font-bold text-white text-sm">Não identificado</span>
             </div>
         </div>
-        <button onclick="solicitarIdentificacao()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors shadow-sm">
-            <i data-lucide="user-check" class="w-4 h-4"></i>
-            Trocar Colaborador
-        </button>
+        <div class="flex items-center gap-2">
+            <button onclick="solicitarIdentificacao()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors shadow-sm">
+                <i data-lucide="user-check" class="w-4 h-4"></i>
+                Trocar Perfil
+            </button>
+        </div>
     </div>
 
-    <!-- Painel de Gerenciamento & Filtros Rápidos -->
+    <!-- Painel de Gerenciamento & Controles -->
     <div class="no-print max-w-4xl mx-auto mb-6 bg-white p-5 rounded-xl shadow-md border border-slate-200 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
@@ -107,14 +109,18 @@
                     <i data-lucide="sliders" class="w-5 h-5 text-copa-orange"></i>
                     Painel de Gerenciamento da Sala
                 </h2>
-                <p class="text-xs text-slate-500">Navegação rápida de datas, auditoria e impressão do informe.</p>
+                <p class="text-xs text-slate-500">Navegação por data, agendamento corporativo e visão semanal.</p>
             </div>
             <div class="flex flex-wrap gap-2">
+                <button onclick="abrirModalNovaReserva()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
+                    <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                    Nova Reserva em Bloco
+                </button>
                 <button onclick="abrirHistoricoModal()" class="flex items-center gap-2 bg-copa-teal hover:bg-copa-darkTeal text-white font-semibold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
                     <i data-lucide="history" class="w-4 h-4 text-copa-orange"></i>
                     Auditoria
                 </button>
-                <button onclick="window.print()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
+                <button onclick="window.print()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm border border-slate-300">
                     <i data-lucide="printer" class="w-4 h-4"></i>
                     Imprimir / PDF
                 </button>
@@ -123,30 +129,42 @@
 
         <hr class="border-slate-200">
 
-        <!-- Seleção de Data e Atalhos -->
+        <!-- Seleção de Modo de Visão, Data e Filtros Mobile -->
         <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between text-xs">
-            <div class="flex items-center gap-2 w-full md:w-auto">
-                <label class="font-bold text-slate-700 whitespace-nowrap">Data:</label>
-                <input type="date" id="inputData" onchange="atualizarData()" class="w-full md:w-auto border border-slate-300 rounded-lg p-2 font-semibold text-copa-teal focus:ring-2 focus:ring-copa-orange focus:outline-none">
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <div class="bg-slate-100 p-1 rounded-lg border border-slate-200 flex items-center gap-1">
+                    <button id="btnVisaoDia" onclick="alternarVisao('dia')" class="bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition">
+                        Visão Diária
+                    </button>
+                    <button id="btnVisaoSemana" onclick="alternarVisao('semana')" class="text-slate-600 hover:text-copa-teal font-bold px-3 py-1.5 rounded-md text-[11px] transition">
+                        Visão Semanal
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2 ml-0 md:ml-2">
+                    <label class="font-bold text-slate-700 whitespace-nowrap">Data:</label>
+                    <input type="date" id="inputData" onchange="atualizarData()" class="border border-slate-300 rounded-lg p-1.5 font-semibold text-copa-teal focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                </div>
             </div>
 
-            <!-- Atalhos de Data -->
-            <div class="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-                <button onclick="definirDataAtalho(0)" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-3 py-2 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
-                    Hoje
-                </button>
-                <button onclick="definirDataAtalho(1)" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-3 py-2 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
-                    Amanhã
-                </button>
-                <button onclick="definirDataProximoDiaUtil()" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-3 py-2 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
-                    Próx. Dia Útil
-                </button>
-            </div>
+            <!-- Atalhos Rápidos e Filtro Mobile -->
+            <div class="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                <div class="flex items-center gap-1">
+                    <button onclick="definirDataAtalho(0)" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
+                        Hoje
+                    </button>
+                    <button onclick="definirDataAtalho(1)" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
+                        Amanhã
+                    </button>
+                    <button onclick="definirDataProximoDiaUtil()" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
+                        Próx. Dia Útil
+                    </button>
+                </div>
 
-            <!-- Resumo de Ocupação -->
-            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
-                <span id="badgeLivres" class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full text-[11px]">-- Livre</span>
-                <span id="badgeOcupados" class="bg-rose-100 text-rose-800 font-bold px-2.5 py-1 rounded-full text-[11px]">-- Ocupado</span>
+                <button id="btnFiltroLivres" onclick="toggleFiltroApenasLivres()" class="bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 transition text-[11px] flex items-center gap-1 whitespace-nowrap">
+                    <i data-lucide="filter" class="w-3.5 h-3.5 text-copa-orange"></i>
+                    <span id="labelFiltroLivres">Apenas Livres</span>
+                </button>
             </div>
         </div>
     </div>
@@ -191,7 +209,7 @@
         </div>
 
         <div class="p-6">
-            <!-- Bloco de Informações e Recursos da Sala -->
+            <!-- Bloco de Informações da Sala -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border-l-4 border-copa-orange shadow-sm">
                 <div class="flex items-center gap-3">
                     <div class="p-2 bg-emerald-100/60 rounded-lg text-copa-teal">
@@ -208,7 +226,7 @@
                     </div>
                     <div>
                         <span class="block text-[10px] font-bold text-copa-teal uppercase tracking-wider">Capacidade</span>
-                        <span id="displayCapacidade" class="text-sm font-bold text-copa-orange">8 Lugares</span>
+                        <span id="displayCapacidade" class="text-sm font-bold text-copa-orange">6 Lugares</span>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
@@ -224,32 +242,58 @@
 
             <!-- Chips de Recursos -->
             <div class="mb-6 flex flex-wrap gap-2 text-[11px] font-bold text-slate-600 border-b border-slate-100 pb-4">
+                <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="users" class="w-3.5 h-3.5 text-copa-orange"></i> 6 Lugares</span>
                 <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="wifi" class="w-3.5 h-3.5 text-copa-orange"></i> Wi-Fi Corporativo</span>
                 <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="tv" class="w-3.5 h-3.5 text-copa-orange"></i> TV / Cabo HDMI</span>
                 <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="thermometer" class="w-3.5 h-3.5 text-copa-orange"></i> Ar-Condicionado</span>
-                <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-copa-orange"></i> Auditado</span>
             </div>
 
-            <!-- Tabela de Horários -->
-            <div class="overflow-x-auto rounded-lg border border-slate-200">
-                <table class="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr class="bg-copa-teal text-white">
-                            <th class="py-3 px-3 border-b border-copa-teal text-center text-copa-orange font-bold w-32">
-                                <span class="flex items-center justify-center gap-1">
-                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> Horário
-                                </span>
-                            </th>
-                            <th class="py-3 px-3 border-b border-copa-teal font-semibold">Responsável / Colaborador</th>
-                            <th class="py-3 px-3 border-b border-copa-teal font-semibold w-36">Setor / Ramal</th>
-                            <th class="py-3 px-3 border-b border-copa-teal font-semibold w-48">Assunto / Projeto</th>
-                            <th class="py-3 px-3 border-b border-copa-teal text-center font-semibold w-24 no-print">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaHorarios">
-                        <!-- Conteúdo JS -->
-                    </tbody>
-                </table>
+            <!-- ÁREA DA GRADE (DIÁRIA OU SEMANAL) -->
+            <div id="containerGradeDiaria">
+                <div class="overflow-x-auto rounded-lg border border-slate-200">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-copa-teal text-white">
+                                <th class="py-3 px-3 border-b border-copa-teal text-center text-copa-orange font-bold w-32">
+                                    <span class="flex items-center justify-center gap-1">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i> Horário
+                                    </span>
+                                </th>
+                                <th class="py-3 px-3 border-b border-copa-teal font-semibold">Responsável / Colaborador</th>
+                                <th class="py-3 px-3 border-b border-copa-teal font-semibold w-36">Setor</th>
+                                <th class="py-3 px-3 border-b border-copa-teal font-semibold w-48">Assunto / Projeto</th>
+                                <th class="py-3 px-3 border-b border-copa-teal text-center font-semibold w-28 no-print">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaHorarios">
+                            <!-- Conteúdo JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="containerGradeSemanal" class="hidden space-y-4">
+                <div class="flex items-center justify-between bg-slate-100 p-3 rounded-lg text-xs font-bold text-copa-teal">
+                    <span>Visão Semanal de Ocupação</span>
+                    <span id="labelIntervaloSemana" class="text-copa-orange">Segunda a Sexta</span>
+                </div>
+                <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                    <table class="w-full text-left border-collapse text-xs">
+                        <thead>
+                            <tr class="bg-copa-teal text-white text-center">
+                                <th class="p-2.5 border-b border-copa-teal font-bold w-24">Horário</th>
+                                <th class="p-2.5 border-b border-copa-teal font-semibold">Segunda</th>
+                                <th class="p-2.5 border-b border-copa-teal font-semibold">Terça</th>
+                                <th class="p-2.5 border-b border-copa-teal font-semibold">Quarta</th>
+                                <th class="p-2.5 border-b border-copa-teal font-semibold">Quinta</th>
+                                <th class="p-2.5 border-b border-copa-teal font-semibold">Sexta</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaSemanal">
+                            <!-- Conteúdo JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Rodapé Institucional -->
@@ -273,7 +317,7 @@
         </div>
     </div>
 
-    <!-- Modal de Identificação -->
+    <!-- MODAL 1: IDENTIFICAÇÃO DO COLABORADOR COM E-MAIL CORPORATIVO -->
     <div id="modalIdentificacao" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-copa-orange">
             <div class="flex items-center gap-3 mb-3">
@@ -282,38 +326,152 @@
                 </div>
                 <div>
                     <h3 class="text-base font-bold text-copa-teal">Identificação do Colaborador</h3>
-                    <p class="text-xs text-slate-500">Acesso ao sistema da Copa Energia</p>
+                    <p class="text-xs text-slate-500">Sua conta corporativa da Copa Energia</p>
                 </div>
             </div>
 
             <p class="text-xs text-slate-600 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                Informe seu nome completo, setor e crie um PIN de 4 números para gerenciar e auditarem seus agendamentos.
+                Informe seus dados corporativos para habilitar a gestão das suas reuniões.
             </p>
 
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Seu Nome Completo</label>
-                    <input type="text" id="inputNomeUsuario" placeholder="Ex: Ruthielen Elis" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                    <label class="block font-semibold text-slate-700 mb-1">Nome Completo *</label>
+                    <input type="text" id="inputNomeUsuario" placeholder="Ex: Ruthielen Elis Soares" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Setor / Departamento</label>
+                    <label class="block font-semibold text-slate-700 mb-1">Setor / Área *</label>
                     <input type="text" id="inputSetorUsuario" placeholder="Ex: Operações / C.O. SJC" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">PIN de Segurança (4 Números)</label>
+                    <label class="block font-semibold text-slate-700 mb-1">E-mail Corporativo (@copaenergia.com.br) *</label>
+                    <input type="email" id="inputEmailUsuario" placeholder="usuario@copaenergia.com.br" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">PIN de Segurança (4 Números) *</label>
                     <input type="password" id="inputPinUsuario" maxlength="4" placeholder="Ex: 1234" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
             </div>
 
             <div class="mt-6">
                 <button onclick="salvarIdentificacao()" class="w-full bg-copa-orange hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-colors shadow-sm text-xs">
-                    Confirmar e Entrar
+                    Confirmar e Acessar Agenda
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Histórico -->
+    <!-- MODAL 2: AGENDAMENTO DE HORÁRIO / BLOCO DE HORÁRIOS (APENAS LIVRES) -->
+    <div id="modalNovaReserva" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-copa-orange">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-base font-bold text-copa-teal flex items-center gap-2">
+                    <i data-lucide="calendar-plus" class="w-5 h-5 text-copa-orange"></i>
+                    Nova Reserva de Sala
+                </h3>
+                <button onclick="fecharModalNovaReserva()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Assunto / Título da Reunião *</label>
+                    <input type="text" id="inputAssuntoReserva" placeholder="Ex: Alinhamento de Operações SJC" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Horário Início *</label>
+                        <select id="selectHoraInicio" onchange="atualizarOpcoesHoraFim()" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none font-semibold text-copa-teal">
+                            <!-- Opções JS dinâmicas com apenas livres -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Horário Fim *</label>
+                        <select id="selectHoraFim" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none font-semibold text-copa-teal">
+                            <!-- Opções JS dinâmicas com apenas livres -->
+                        </select>
+                    </div>
+                </div>
+
+                <div id="avisoSemHorarios" class="hidden bg-rose-50 text-rose-700 p-2.5 rounded-lg border border-rose-200 text-[11px] font-bold">
+                    Não há horários disponíveis para agendamento na data selecionada.
+                </div>
+
+                <div class="bg-copa-lightOrange p-3 rounded-lg border border-copa-borderOrange text-[11px] text-amber-950 flex items-start gap-2">
+                    <i data-lucide="info" class="w-4 h-4 text-copa-orange flex-shrink-0 mt-0.5"></i>
+                    <span>O sistema exibe estritamente os horários livres para reserva na data selecionada.</span>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-2">
+                <button onclick="fecharModalNovaReserva()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-lg text-xs">
+                    Cancelar
+                </button>
+                <button id="btnConfirmarReservaBloco" onclick="confirmarAgendamentoBloco()" class="bg-copa-orange hover:bg-orange-600 text-white font-bold px-5 py-2.5 rounded-lg text-xs shadow-sm">
+                    Confirmar Reserva
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CONFIRMAÇÃO DE SUCESSO E GERAR TEAMS / ICS -->
+    <div id="modalSucessoReserva" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-emerald-500 text-center">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="check-circle-2" class="w-8 h-8"></i>
+            </div>
+            <h3 class="text-base font-bold text-copa-teal mb-1">Agendamento Concluído!</h3>
+            <p class="text-xs text-slate-600 mb-4" id="textoSucessoReserva">Sua sala foi reservada com sucesso.</p>
+
+            <div class="space-y-2 mb-6">
+                <a id="btnTeamsCalendar" target="_blank" class="w-full bg-[#5B5FC7] hover:bg-[#4F52B2] text-white font-bold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition shadow-sm">
+                    <i data-lucide="video" class="w-4 h-4"></i>
+                    Adicionar no Microsoft Teams / Outlook
+                </a>
+                <button onclick="baixarArquivoICS()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition border border-slate-300">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    Baixar Lembrete (.ics)
+                </button>
+            </div>
+
+            <button onclick="fecharModalSucesso()" class="bg-copa-teal text-white font-bold py-2 px-6 rounded-lg text-xs">
+                Fechar
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL 4: CANCELAMENTO AUDITADO -->
+    <div id="modalCancelarReserva" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-rose-600">
+            <h3 class="text-base font-bold text-copa-teal mb-2 flex items-center gap-2">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600"></i>
+                Cancelar Agendamento
+            </h3>
+            <p class="text-xs text-slate-600 mb-4" id="textoAvisoCancelamento">
+                Informe o motivo para registro de auditoria na Copa Energia.
+            </p>
+
+            <div class="space-y-3 text-xs mb-4">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Motivo do Cancelamento *</label>
+                    <input type="text" id="inputMotivoCancelamento" placeholder="Ex: Reunião reagendada pelo solicitante" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button onclick="fecharModalCancelar()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-lg text-xs">
+                    Voltar
+                </button>
+                <button onclick="confirmarCancelamentoModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2.5 rounded-lg text-xs shadow-sm">
+                    Confirmar Cancelamento
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: HISTÓRICO DE AUDITORIA -->
     <div id="modalHistorico" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl border-t-4 border-copa-teal">
             <div class="flex justify-between items-center mb-4">
@@ -351,6 +509,7 @@
         </div>
     </div>
 
+    <!-- SCRIPT DE LÓGICA DO SISTEMA -->
     <script>
         const horarios = [
             "08:00 - 08:30", "08:30 - 09:00",
@@ -368,6 +527,10 @@
         let reservas = {};
         let logsCancelamento = [];
         let usuarioSessao = JSON.parse(localStorage.getItem('copa_usuario_atual')) || null;
+        let modoVisao = 'dia';
+        let filtroApenasLivres = false;
+        let slotParaCancelar = null;
+        let dadosUltimaReserva = null;
 
         function inicializarFirebaseListeners() {
             refReservas.on('value', (snapshot) => {
@@ -382,20 +545,31 @@
         }
 
         function solicitarIdentificacao() {
+            if (usuarioSessao) {
+                document.getElementById('inputNomeUsuario').value = usuarioSessao.nome || '';
+                document.getElementById('inputSetorUsuario').value = usuarioSessao.setor || '';
+                document.getElementById('inputEmailUsuario').value = usuarioSessao.email || '';
+            }
             document.getElementById('modalIdentificacao').classList.remove('hidden');
         }
 
         function salvarIdentificacao() {
             const nome = document.getElementById('inputNomeUsuario').value.trim();
             const setor = document.getElementById('inputSetorUsuario').value.trim();
+            const email = document.getElementById('inputEmailUsuario').value.trim().toLowerCase();
             const pin = document.getElementById('inputPinUsuario').value.trim();
 
-            if (!nome || !pin || pin.length < 4) {
-                alert('Por favor, informe seu nome e um PIN de 4 números.');
+            if (!nome || !setor || !email || !pin || pin.length < 4) {
+                alert('Por favor, preencha o Nome, Setor, E-mail Corporativo e o PIN de 4 números.');
                 return;
             }
 
-            usuarioSessao = { nome, setor, pin };
+            if (!email.endsWith('@copaenergia.com.br')) {
+                alert('Por favor, utilize um e-mail corporativo válido (@copaenergia.com.br).');
+                return;
+            }
+
+            usuarioSessao = { nome, setor, email, pin };
             localStorage.setItem('copa_usuario_atual', JSON.stringify(usuarioSessao));
             document.getElementById('modalIdentificacao').classList.add('hidden');
             atualizarHeaderUsuario();
@@ -432,62 +606,285 @@
             atualizarData();
         }
 
-        function agendarSlot(horario) {
-            if (!usuarioSessao) {
-                solicitarIdentificacao();
-                return;
+        function toggleFiltroApenasLivres() {
+            filtroApenasLivres = !filtroApenasLivres;
+            const btn = document.getElementById('btnFiltroLivres');
+            const label = document.getElementById('labelFiltroLivres');
+
+            if (filtroApenasLivres) {
+                btn.className = "bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1 whitespace-nowrap shadow-sm";
+                label.innerText = "Mostrando Apenas Livres";
+            } else {
+                btn.className = "bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 transition text-[11px] flex items-center gap-1 whitespace-nowrap";
+                label.innerText = "Apenas Livres";
             }
-
-            const assunto = prompt(`Agendar horário ${horario}.\nDigite o Assunto/Projeto da Reunião:`);
-            if (assunto === null) return;
-
-            const chaveData = getDataAtualChave();
-
-            refReservas.child(chaveData).child(horario.replace(':', 'h')).set({
-                horarioOriginal: horario,
-                responsavel: usuarioSessao.nome,
-                setor: usuarioSessao.setor || '-',
-                assunto: assunto || 'Reunião Geral',
-                criadoPor: usuarioSessao.nome,
-                criadoEm: new Date().toLocaleString('pt-BR')
-            });
+            renderTabela();
         }
 
-        function cancelarSlot(horario) {
+        function alternarVisao(modo) {
+            modoVisao = modo;
+            const btnDia = document.getElementById('btnVisaoDia');
+            const btnSemana = document.getElementById('btnVisaoSemana');
+            const containerDia = document.getElementById('containerGradeDiaria');
+            const containerSemana = document.getElementById('containerGradeSemanal');
+
+            if (modo === 'dia') {
+                btnDia.className = "bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition";
+                btnSemana.className = "text-slate-600 hover:text-copa-teal font-bold px-3 py-1.5 rounded-md text-[11px] transition";
+                containerDia.classList.remove('hidden');
+                containerSemana.classList.add('hidden');
+            } else {
+                btnSemana.className = "bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition";
+                btnDia.className = "text-slate-600 hover:text-copa-teal font-bold px-3 py-1.5 rounded-md text-[11px] transition";
+                containerSemana.classList.remove('hidden');
+                containerDia.classList.add('hidden');
+            }
+            renderTabela();
+        }
+
+        // AGENDAMENTO EM BLOCO - EXIBE APENAS HORÁRIOS DISPONÍVEIS
+        function abrirModalNovaReserva(horarioInicioSugerido) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
                 return;
             }
 
             const chaveData = getDataAtualChave();
-            const chaveHorario = horario.replace(':', 'h');
-            const reservaAtual = reservas[chaveData]?.[chaveHorario];
+            const reservasHoje = reservas[chaveData] || {};
 
-            if (!reservaAtual) return;
+            const selInicio = document.getElementById('selectHoraInicio');
+            selInicio.innerHTML = '';
 
-            const ehProprioCriador = reservaAtual.responsavel === usuarioSessao.nome;
-            let aviso = ehProprioCriador 
-                ? `Você está cancelando seu agendamento das ${horario}.` 
-                : `ATENÇÃO: Este agendamento pertence a ${reservaAtual.responsavel}.\nO cancelamento por terceiros será REGISTRADO com seu nome (${usuarioSessao.nome}).`;
-
-            if (!confirm(`${aviso}\n\nDeseja realmente prosseguir?`)) return;
-
-            const motivo = prompt("Digite o motivo do cancelamento para auditoria:");
-            if (motivo === null) return;
-
-            refLogs.push({
-                dataReuniao: chaveData,
-                horario: horario,
-                reservadoPor: reservaAtual.responsavel,
-                canceladoPor: usuarioSessao.nome,
-                setorCancelador: usuarioSessao.setor || '-',
-                motivo: motivo || 'Sem motivo informado',
-                dataAcao: new Date().toLocaleString('pt-BR'),
-                timestamp: new Date().toISOString()
+            // Filtrar apenas os slots livres na data selecionada
+            const slotsLivres = horarios.filter(h => {
+                const chaveHorario = h.replace(':', 'h');
+                const jaReservado = !!reservasHoje[chaveHorario];
+                const passado = ehHorarioPassado(h, chaveData);
+                return !jaReservado && !passado;
             });
 
-            refReservas.child(chaveData).child(chaveHorario).remove();
-            alert(`Agendamento cancelado com sucesso.`);
+            const aviso = document.getElementById('avisoSemHorarios');
+            const btnConfirmar = document.getElementById('btnConfirmarReservaBloco');
+
+            if (slotsLivres.length === 0) {
+                aviso.classList.remove('hidden');
+                btnConfirmar.disabled = true;
+                btnConfirmar.classList.add('opacity-50', 'cursor-not-allowed');
+                document.getElementById('selectHoraFim').innerHTML = '';
+            } else {
+                aviso.classList.add('hidden');
+                btnConfirmar.disabled = false;
+                btnConfirmar.classList.remove('opacity-50', 'cursor-not-allowed');
+
+                slotsLivres.forEach(h => {
+                    const inicio = h.split(' - ')[0];
+                    const opt = document.createElement('option');
+                    opt.value = inicio;
+                    opt.innerText = inicio;
+                    selInicio.appendChild(opt);
+                });
+
+                if (horarioInicioSugerido) {
+                    const inicioSugerido = horarioInicioSugerido.split(' - ')[0];
+                    if (slotsLivres.some(h => h.startsWith(inicioSugerido))) {
+                        selInicio.value = inicioSugerido;
+                    }
+                }
+                atualizarOpcoesHoraFim();
+            }
+
+            document.getElementById('modalNovaReserva').classList.remove('hidden');
+        }
+
+        function fecharModalNovaReserva() {
+            document.getElementById('modalNovaReserva').classList.add('hidden');
+        }
+
+        function atualizarOpcoesHoraFim() {
+            const horaInicioSel = document.getElementById('selectHoraInicio').value;
+            const selFim = document.getElementById('selectHoraFim');
+            selFim.innerHTML = '';
+
+            if (!horaInicioSel) return;
+
+            const chaveData = getDataAtualChave();
+            const reservasHoje = reservas[chaveData] || {};
+
+            // Encontrar índice do slot inicial
+            const idxInicio = horarios.findIndex(h => h.startsWith(horaInicioSel));
+            if (idxInicio === -1) return;
+
+            // Percorrer os slots consecutivos enquanto estiverem livres
+            for (let i = idxInicio; i < horarios.length; i++) {
+                const slotAtual = horarios[i];
+                const chaveHorario = slotAtual.replace(':', 'h');
+
+                // Se encontrou um slot ocupado no meio do caminho, interrompe as opções de término
+                if (reservasHoje[chaveHorario]) {
+                    break;
+                }
+
+                const horaFim = slotAtual.split(' - ')[1];
+                const opt = document.createElement('option');
+                opt.value = horaFim;
+                opt.innerText = horaFim;
+                selFim.appendChild(opt);
+            }
+        }
+
+        function confirmarAgendamentoBloco() {
+            const assunto = document.getElementById('inputAssuntoReserva').value.trim();
+            const hInicio = document.getElementById('selectHoraInicio').value;
+            const hFim = document.getElementById('selectHoraFim').value;
+            const chaveData = getDataAtualChave();
+
+            if (!assunto) {
+                alert('Por favor, informe o assunto ou projeto da reunião.');
+                return;
+            }
+
+            if (!hInicio || !hFim) {
+                alert('Por favor, selecione os horários de início e fim.');
+                return;
+            }
+
+            // Filtrar slots de horários abrangidos
+            const slotsAfetados = horarios.filter(h => {
+                const [inSlot, fimSlot] = h.split(' - ');
+                return inSlot >= hInicio && fimSlot <= hFim;
+            });
+
+            const reservasHoje = reservas[chaveData] || {};
+            const jaReservados = slotsAfetados.filter(slot => reservasHoje[slot.replace(':', 'h')]);
+
+            if (jaReservados.length > 0) {
+                alert(`Não foi possível agendar. Os seguintes horários já estão ocupados: ${jaReservados.join(', ')}`);
+                return;
+            }
+
+            // Gravar todos os slots no Firebase
+            slotsAfetados.forEach(slot => {
+                refReservas.child(chaveData).child(slot.replace(':', 'h')).set({
+                    horarioOriginal: slot,
+                    responsavel: usuarioSessao.nome,
+                    setor: usuarioSessao.setor || '-',
+                    email: usuarioSessao.email,
+                    assunto: assunto,
+                    criadoPor: usuarioSessao.nome,
+                    criadoEm: new Date().toLocaleString('pt-BR')
+                });
+            });
+
+            fecharModalNovaReserva();
+
+            // Preparar Modal de Sucesso + Microsoft Teams / Outlook
+            dadosUltimaReserva = {
+                data: chaveData,
+                horaInicio: hInicio,
+                horaFim: hFim,
+                assunto: assunto,
+                solicitante: usuarioSessao.nome
+            };
+
+            gerarLinksAgendaTeams(dadosUltimaReserva);
+            document.getElementById('modalSucessoReserva').classList.remove('hidden');
+        }
+
+        function gerarLinksAgendaTeams(dados) {
+            const [ano, mes, dia] = dados.data.split('-');
+            const dtInicioISO = `${ano}-${mes}-${dia}T${dados.horaInicio}:00`;
+            const dtFimISO = `${ano}-${mes}-${dia}T${dados.horaFim}:00`;
+
+            const assunto = encodeURIComponent(`Reunião: ${dados.assunto}`);
+            const local = encodeURIComponent(`Sala de Reunião - Copa Energia SJC`);
+            const corpo = encodeURIComponent(`Reunião agendada por: ${dados.solicitante}\nSala de Reunião - Copa Energia`);
+
+            // Link do Outlook/Teams na Web
+            const urlTeamsWeb = `https://outlook.office.com/calendar/0/deeplink/compose?subject=${assunto}&location=${local}&body=${corpo}&startdt=${dtInicioISO}&enddt=${dtFimISO}`;
+            
+            document.getElementById('btnTeamsCalendar').href = urlTeamsWeb;
+            document.getElementById('textoSucessoReserva').innerText = `Reunião "${dados.assunto}" agendada das ${dados.horaInicio} às ${dados.horaFim} (${dia}/${mes}/${ano}).`;
+        }
+
+        function baixarArquivoICS() {
+            if (!dadosUltimaReserva) return;
+            const [ano, mes, dia] = dadosUltimaReserva.data.split('-');
+            const dtStart = `${ano}${mes}${dia}T${dadosUltimaReserva.horaInicio.replace(':', '')}00`;
+            const dtEnd = `${ano}${mes}${dia}T${dadosUltimaReserva.horaFim.replace(':', '')}00`;
+
+            const conteudoICS = [
+                "BEGIN:VCALENDAR",
+                "VERSION:2.0",
+                "PRODID:-//Copa Energia//Agendamento Sala//PT-BR",
+                "BEGIN:VEVENT",
+                `SUMMARY:Reunião: ${dadosUltimaReserva.assunto}`,
+                `DESCRIPTION:Agendado por ${dadosUltimaReserva.solicitante}`,
+                "LOCATION:Sala de Reunião - Copa Energia SJC",
+                `DTSTART:${dtStart}`,
+                `DTEND:${dtEnd}`,
+                "END:VEVENT",
+                "END:VCALENDAR"
+            ].join("\r\n");
+
+            const blob = new Blob([conteudoICS], { type: "text/calendar;charset=utf-8" });
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.setAttribute('download', `reuniao-copaenergia-${dadosUltimaReserva.data}.ics`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function fecharModalSucesso() {
+            document.getElementById('modalSucessoReserva').classList.add('hidden');
+        }
+
+        // CANCELAMENTO AUDITADO
+        function abrirModalCancelarSlot(horario) {
+            if (!usuarioSessao) {
+                solicitarIdentificacao();
+                return;
+            }
+            slotParaCancelar = horario;
+            document.getElementById('inputMotivoCancelamento').value = '';
+            document.getElementById('modalCancelarReserva').classList.remove('hidden');
+        }
+
+        function fecharModalCancelar() {
+            document.getElementById('modalCancelarReserva').classList.add('hidden');
+            slotParaCancelar = null;
+        }
+
+        function confirmarCancelamentoModal() {
+            const motivo = document.getElementById('inputMotivoCancelamento').value.trim();
+            if (!motivo) {
+                alert('Por favor, escreva o motivo do cancelamento.');
+                return;
+            }
+
+            const chaveData = getDataAtualChave();
+            const chaveHorario = slotParaCancelar.replace(':', 'h');
+            const reservaAtual = reservas[chaveData]?.[chaveHorario];
+
+            if (reservaAtual) {
+                refLogs.push({
+                    dataReuniao: chaveData,
+                    horario: slotParaCancelar,
+                    reservadoPor: reservaAtual.responsavel,
+                    emailReservado: reservaAtual.email || '-',
+                    canceladoPor: usuarioSessao.nome,
+                    emailCancelador: usuarioSessao.email,
+                    setorCancelador: usuarioSessao.setor || '-',
+                    motivo: motivo,
+                    dataAcao: new Date().toLocaleString('pt-BR'),
+                    timestamp: new Date().toISOString()
+                });
+
+                refReservas.child(chaveData).child(chaveHorario).remove();
+            }
+
+            fecharModalCancelar();
+            alert('Cancelamento registrado no histórico de auditoria.');
         }
 
         function obterHorarioAtualHHMM() {
@@ -495,6 +892,16 @@
             const h = String(agora.getHours()).padStart(2, '0');
             const m = String(agora.getMinutes()).padStart(2, '0');
             return `${h}:${m}`;
+        }
+
+        function ehHorarioPassado(horarioString, dataChave) {
+            const hojeData = new Date().toISOString().split('T')[0];
+            if (dataChave < hojeData) return true;
+            if (dataChave > hojeData) return false;
+
+            const agoraHHMM = obterHorarioAtualHHMM();
+            const fimSlot = horarioString.split(' - ')[1];
+            return agoraHHMM >= fimSlot;
         }
 
         function ehHorarioAtual(horarioString, dataChave) {
@@ -507,24 +914,31 @@
         }
 
         function renderTabela() {
+            if (modoVisao === 'dia') {
+                renderTabelaDiaria();
+            } else {
+                renderTabelaSemanal();
+            }
+            lucide.createIcons();
+        }
+
+        function renderTabelaDiaria() {
             const tbody = document.getElementById('tabelaHorarios');
             tbody.innerHTML = '';
             const chaveData = getDataAtualChave();
             const reservasHoje = reservas[chaveData] || {};
 
-            let countLivres = 0;
-            let countOcupados = 0;
-
             horarios.forEach((horario, index) => {
-                const tr = document.createElement('tr');
                 const chaveHorario = horario.replace(':', 'h');
                 const reserva = reservasHoje[chaveHorario];
+                const passado = ehHorarioPassado(horario, chaveData);
                 const estaAcontecendoAgora = ehHorarioAtual(horario, chaveData);
 
-                if (reserva) countOcupados++;
-                else countLivres++;
+                if (filtroApenasLivres && reserva) return;
 
+                const tr = document.createElement('tr');
                 tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+
                 if (estaAcontecendoAgora) {
                     tr.className += ' bg-amber-50/90 border-l-4 border-l-copa-orange';
                 }
@@ -545,29 +959,40 @@
                                 ${reserva.responsavel}
                             </div>
                         </td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-600">
-                            ${reserva.setor}
+                        <td class="py-2.5 px-3 border border-slate-200 text-slate-600 font-medium">
+                            ${reserva.setor && reserva.setor !== '-' ? reserva.setor : '-'}
                         </td>
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-600">
                             ${reserva.assunto}
                         </td>
                         <td class="py-2.5 px-3 border border-slate-200 text-center no-print">
-                            <button onclick="cancelarSlot('${horario}')" class="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
+                            <button onclick="abrirModalCancelarSlot('${horario}')" class="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Cancelar
                             </button>
+                        </td>
+                    `;
+                } else if (passado) {
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-slate-400 bg-slate-100">
+                            ${horario}
+                        </td>
+                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">Encerrado</td>
+                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
+                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
+                        <td class="py-2.5 px-3 border border-slate-200 text-center no-print">
+                            <span class="text-slate-400 text-[10px] font-bold uppercase">Concluído</span>
                         </td>
                     `;
                 } else {
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-copa-teal">
                             ${horario}
-                            ${badgeAgora}
                         </td>
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">Disponível</td>
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
                         <td class="py-2.5 px-3 border border-slate-200 text-center no-print">
-                            <button onclick="agendarSlot('${horario}')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
+                            <button onclick="abrirModalNovaReserva('${horario}')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> Reservar
                             </button>
                         </td>
@@ -576,11 +1001,49 @@
 
                 tbody.appendChild(tr);
             });
+        }
 
-            document.getElementById('badgeLivres').innerText = `${countLivres} Livres`;
-            document.getElementById('badgeOcupados').innerText = `${countOcupados} Ocupados`;
+        function renderTabelaSemanal() {
+            const tbody = document.getElementById('tabelaSemanal');
+            tbody.innerHTML = '';
+            
+            const dataBase = new Date(getDataAtualChave());
+            const diaSemana = dataBase.getDay();
+            const seg = new Date(dataBase);
+            seg.setDate(dataBase.getDate() - (diaSemana === 0 ? 6 : diaSemana - 1));
 
-            lucide.createIcons();
+            const diasSemanaChaves = [];
+            for (let i = 0; i < 5; i++) {
+                const d = new Date(seg);
+                d.setDate(seg.getDate() + i);
+                diasSemanaChaves.push(d.toISOString().split('T')[0]);
+            }
+
+            horarios.forEach((horario, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+
+                let html = `<td class="p-2 border border-slate-200 text-center font-bold text-copa-teal">${horario}</td>`;
+
+                diasSemanaChaves.forEach(chaveData => {
+                    const chaveHorario = horario.replace(':', 'h');
+                    const reserva = reservas[chaveData]?.[chaveHorario];
+
+                    if (reserva) {
+                        html += `
+                            <td class="p-2 border border-slate-200 bg-orange-100 text-copa-teal font-bold text-[10px] text-center">
+                                <span class="block text-copa-orange font-black">${reserva.responsavel}</span>
+                                <span class="text-slate-600 truncate block max-w-[90px] mx-auto">${reserva.assunto}</span>
+                            </td>
+                        `;
+                    } else {
+                        html += `<td class="p-2 border border-slate-200 text-center text-slate-300 font-medium text-[10px]">Livre</td>`;
+                    }
+                });
+
+                tr.innerHTML = html;
+                tbody.appendChild(tr);
+            });
         }
 
         function atualizarData() {
@@ -607,7 +1070,7 @@
                     tr.innerHTML = `
                         <td class="p-2.5 font-semibold text-slate-700">${log.dataReuniao} (${log.horario})</td>
                         <td class="p-2.5 text-slate-600">${log.reservadoPor}</td>
-                        <td class="p-2.5 font-bold text-red-600">${log.canceladoPor} (${log.setorCancelador})</td>
+                        <td class="p-2.5 font-bold text-rose-600">${log.canceladoPor} (${log.setorCancelador || log.emailCancelador})</td>
                         <td class="p-2.5 text-slate-600">${log.motivo}</td>
                         <td class="p-2.5 text-slate-400">${log.dataAcao}</td>
                     `;
