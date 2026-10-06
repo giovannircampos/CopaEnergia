@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendamento de Sala de Reunião - Copa Energia</title>
-    <!-- Google Fonts: Montserrat para alinhamento com a marca -->
+    <!-- Google Fonts: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -19,12 +19,12 @@
                     },
                     colors: {
                         copa: {
-                            teal: '#1F332C',         // Verde-escuro / Teal oficial da marca
-                            darkTeal: '#16241F',     // Tom mais escuro para fundos/hover
-                            orange: '#FA8432',       // Laranja vibrante das pétalas
-                            lightOrange: '#FFF4EB',  // Fundo suave para destaques
-                            borderOrange: '#FCD8C1', // Borda sutil de destaque
-                            grayBg: '#F4F6F5'        // Fundo suave corporativo
+                            teal: '#1F332C',
+                            darkTeal: '#16241F',
+                            orange: '#FA8432',
+                            lightOrange: '#FFF4EB',
+                            borderOrange: '#FCD8C1',
+                            grayBg: '#F4F6F5'
                         }
                     }
                 }
@@ -34,34 +34,23 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- SDKs do Firebase v9 (Compatibilidade Web) -->
+    <!-- SDKs do Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
     <style>
-        body {
-            font-family: 'Montserrat', sans-serif;
-        }
+        body { font-family: 'Montserrat', sans-serif; }
         @media print {
-            .no-print {
-                display: none !important;
-            }
-            body {
-                background: white !important;
-                padding: 0 !important;
-            }
-            .print-container {
-                box-shadow: none !important;
-                border: none !important;
-                max-width: 100% !important;
-                width: 100% !important;
-            }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .no-print { display: none !important; }
+            body { background: white !important; padding: 0 !important; }
+            .print-container { box-shadow: none !important; border: none !important; max-width: 100% !important; width: 100% !important; }
         }
     </style>
 </head>
-<body class="bg-copa-grayBg min-h-screen text-slate-800 p-4 md:p-8">
+<body class="bg-copa-grayBg min-h-screen text-slate-800 p-3 md:p-8">
 
-    <!-- CONFIGURAÇÃO E CONEXÃO COM O FIREBASE -->
+    <!-- FIREBASE INIT -->
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCLHXj24INoj1AaRqf2mS9DjU3lTE0bFE4",
@@ -74,17 +63,15 @@
             measurementId: "G-97TR7TZ7J4"
         };
 
-        // Inicializar Firebase Realtime Database
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const refReservas = db.ref('copa_reservas');
         const refLogs = db.ref('copa_logs_cancelamento');
     </script>
 
-    <!-- Header do Usuário Logado -->
+    <!-- Header do Usuário -->
     <div class="no-print max-w-4xl mx-auto mb-4 bg-copa-teal text-white p-4 rounded-xl shadow-md flex flex-wrap items-center justify-between gap-4 border-l-4 border-copa-orange">
         <div class="flex items-center gap-3">
-            <!-- Ícone / Símbolo Vetorial Exato da Copa Energia (10 Pétalas) -->
             <div class="w-10 h-10 flex items-center justify-center bg-white rounded-lg p-1.5 shadow-sm">
                 <svg viewBox="0 0 100 100" class="w-full h-full">
                     <g transform="translate(50,50)">
@@ -112,55 +99,65 @@
         </button>
     </div>
 
-    <!-- Painel de Controles Superior -->
-    <div class="no-print max-w-4xl mx-auto mb-6 bg-white p-5 rounded-xl shadow-md border border-slate-200">
+    <!-- Painel de Gerenciamento & Filtros Rápidos -->
+    <div class="no-print max-w-4xl mx-auto mb-6 bg-white p-5 rounded-xl shadow-md border border-slate-200 space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
                 <h2 class="text-base font-bold text-copa-teal flex items-center gap-2">
                     <i data-lucide="sliders" class="w-5 h-5 text-copa-orange"></i>
                     Painel de Gerenciamento da Sala
                 </h2>
-                <p class="text-xs text-slate-500">Configure os dados, acesse o histórico de auditoria e prepare a folha para impressão.</p>
+                <p class="text-xs text-slate-500">Navegação rápida de datas, auditoria e impressão do informe.</p>
             </div>
             <div class="flex flex-wrap gap-2">
                 <button onclick="abrirHistoricoModal()" class="flex items-center gap-2 bg-copa-teal hover:bg-copa-darkTeal text-white font-semibold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
                     <i data-lucide="history" class="w-4 h-4 text-copa-orange"></i>
-                    Auditoria de Cancelamentos
+                    Auditoria
                 </button>
                 <button onclick="window.print()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
                     <i data-lucide="printer" class="w-4 h-4"></i>
-                    Imprimir / Salvar PDF
+                    Imprimir / PDF
                 </button>
             </div>
         </div>
 
-        <hr class="my-4 border-slate-200">
+        <hr class="border-slate-200">
 
-        <!-- Formulário Rápido de Configuração -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-            <div>
-                <label class="block font-semibold text-slate-700 mb-1">Nome da Sala</label>
-                <input type="text" id="inputSala" value="Sala Sustentabilidade" oninput="atualizarCabecalho()" class="w-full border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+        <!-- Seleção de Data e Atalhos -->
+        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between text-xs">
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <label class="font-bold text-slate-700 whitespace-nowrap">Data:</label>
+                <input type="date" id="inputData" onchange="atualizarData()" class="w-full md:w-auto border border-slate-300 rounded-lg p-2 font-semibold text-copa-teal focus:ring-2 focus:ring-copa-orange focus:outline-none">
             </div>
-            <div>
-                <label class="block font-semibold text-slate-700 mb-1">Capacidade</label>
-                <input type="text" id="inputCapacidade" value="8 Lugares" oninput="atualizarCabecalho()" class="w-full border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+
+            <!-- Atalhos de Data -->
+            <div class="flex items-center gap-1.5 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+                <button onclick="definirDataAtalho(0)" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-3 py-2 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
+                    Hoje
+                </button>
+                <button onclick="definirDataAtalho(1)" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-3 py-2 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
+                    Amanhã
+                </button>
+                <button onclick="definirDataProximoDiaUtil()" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-3 py-2 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
+                    Próx. Dia Útil
+                </button>
             </div>
-            <div>
-                <label class="block font-semibold text-slate-700 mb-1">Data do Agendamento</label>
-                <input type="date" id="inputData" onchange="atualizarData()" class="w-full border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+
+            <!-- Resumo de Ocupação -->
+            <div class="flex items-center gap-2 w-full md:w-auto justify-end">
+                <span id="badgeLivres" class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full text-[11px]">-- Livre</span>
+                <span id="badgeOcupados" class="bg-rose-100 text-rose-800 font-bold px-2.5 py-1 rounded-full text-[11px]">-- Ocupado</span>
             </div>
         </div>
     </div>
 
-    <!-- Documento Principal (Folha da Porta) -->
+    <!-- Documento Principal -->
     <div class="print-container max-w-4xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
         
-        <!-- Topo Oficial Marca Copa Energia -->
+        <!-- Topo Marca Copa Energia -->
         <div class="bg-copa-teal text-white p-6 border-b-4 border-copa-orange relative overflow-hidden">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
                 <div class="flex items-center gap-4">
-                    <!-- Logo / Marca Oficial com o Ícone Exato e Tipografia Fiel -->
                     <div class="w-14 h-14 bg-white p-2 rounded-xl shadow-md flex items-center justify-center flex-shrink-0">
                         <svg viewBox="0 0 100 100" class="w-full h-full">
                             <g transform="translate(50,50)">
@@ -182,9 +179,8 @@
                             <span class="text-2xl font-black tracking-tight text-white block">COPA</span>
                             <span class="text-xl font-light tracking-wide text-white block -mt-1">energia</span>
                         </div>
-                        <p class="text-copa-orange text-xs font-normal mt-1.5 leading-snug">
-                            Energizar <span class="font-light text-white">vidas e negócios</span><br/>
-                            <span class="font-light text-white">de forma</span> sustentável
+                        <p class="text-copa-orange text-[10px] font-bold tracking-widest uppercase mt-2">
+                            ENERGIA DO BRASILEIRO
                         </p>
                     </div>
                 </div>
@@ -195,7 +191,7 @@
         </div>
 
         <div class="p-6">
-            <!-- Bloco de Informações da Sala -->
+            <!-- Bloco de Informações e Recursos da Sala -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border-l-4 border-copa-orange shadow-sm">
                 <div class="flex items-center gap-3">
                     <div class="p-2 bg-emerald-100/60 rounded-lg text-copa-teal">
@@ -220,32 +216,18 @@
                         <i data-lucide="calendar" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <span class="block text-[10px] font-bold text-copa-teal uppercase tracking-wider">Data</span>
+                        <span class="block text-[10px] font-bold text-copa-teal uppercase tracking-wider">Data Selecionada</span>
                         <span id="displayData" class="text-sm font-bold text-slate-800">___ / ___ / ______</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Orientações Gerais -->
-            <div class="bg-copa-lightOrange border border-copa-borderOrange p-4 rounded-xl mb-6 text-xs text-amber-950">
-                <h3 class="font-bold text-copa-orange text-xs mb-1.5 flex items-center gap-2 uppercase tracking-wide">
-                    <i data-lucide="info" class="w-4 h-4"></i>
-                    Orientações de Uso do Espaço:
-                </h3>
-                <ul class="grid grid-cols-1 md:grid-cols-3 gap-2 ml-1 text-slate-700 text-[11px]">
-                    <li class="flex items-start gap-1.5">
-                        <i data-lucide="clock" class="w-3.5 h-3.5 text-copa-orange flex-shrink-0 mt-0.5"></i>
-                        Respeite rigorosamente o horário agendado.
-                    </li>
-                    <li class="flex items-start gap-1.5">
-                        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-copa-orange flex-shrink-0 mt-0.5"></i>
-                        Organize as cadeiras e mantenha o espaço limpo.
-                    </li>
-                    <li class="flex items-start gap-1.5">
-                        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-copa-orange flex-shrink-0 mt-0.5"></i>
-                        Cancelamentos de terceiros são auditados.
-                    </li>
-                </ul>
+            <!-- Chips de Recursos -->
+            <div class="mb-6 flex flex-wrap gap-2 text-[11px] font-bold text-slate-600 border-b border-slate-100 pb-4">
+                <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="wifi" class="w-3.5 h-3.5 text-copa-orange"></i> Wi-Fi Corporativo</span>
+                <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="tv" class="w-3.5 h-3.5 text-copa-orange"></i> TV / Cabo HDMI</span>
+                <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="thermometer" class="w-3.5 h-3.5 text-copa-orange"></i> Ar-Condicionado</span>
+                <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-copa-orange"></i> Auditado</span>
             </div>
 
             <!-- Tabela de Horários -->
@@ -291,7 +273,7 @@
         </div>
     </div>
 
-    <!-- Modal de Identificação do Usuário -->
+    <!-- Modal de Identificação -->
     <div id="modalIdentificacao" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-copa-orange">
             <div class="flex items-center gap-3 mb-3">
@@ -311,11 +293,11 @@
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Seu Nome Completo</label>
-                    <input type="text" id="inputNomeUsuario" placeholder="Ex: Carlos Silva" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                    <input type="text" id="inputNomeUsuario" placeholder="Ex: Ruthielen Elis" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Setor / Departamento</label>
-                    <input type="text" id="inputSetorUsuario" placeholder="Ex: Operações / TI" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                    <input type="text" id="inputSetorUsuario" placeholder="Ex: Operações / C.O. SJC" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">PIN de Segurança (4 Números)</label>
@@ -331,7 +313,7 @@
         </div>
     </div>
 
-    <!-- Modal do Histórico de Cancelamentos (Auditoria) -->
+    <!-- Modal de Histórico -->
     <div id="modalHistorico" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl border-t-4 border-copa-teal">
             <div class="flex justify-between items-center mb-4">
@@ -387,15 +369,12 @@
         let logsCancelamento = [];
         let usuarioSessao = JSON.parse(localStorage.getItem('copa_usuario_atual')) || null;
 
-        // OUVINTES EM TEMPO REAL DO FIREBASE
         function inicializarFirebaseListeners() {
-            // Escutar agendamentos em tempo real
             refReservas.on('value', (snapshot) => {
                 reservas = snapshot.val() || {};
                 renderTabela();
             });
 
-            // Escutar histórico de cancelamentos em tempo real
             refLogs.on('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 logsCancelamento = Object.values(data).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -436,6 +415,23 @@
             return document.getElementById('inputData').value || new Date().toISOString().split('T')[0];
         }
 
+        function definirDataAtalho(diasAdicionais) {
+            const d = new Date();
+            d.setDate(d.getDate() + diasAdicionais);
+            document.getElementById('inputData').value = d.toISOString().split('T')[0];
+            atualizarData();
+        }
+
+        function definirDataProximoDiaUtil() {
+            const d = new Date();
+            d.setDate(d.getDate() + 1);
+            while (d.getDay() === 0 || d.getDay() === 6) {
+                d.setDate(d.getDate() + 1);
+            }
+            document.getElementById('inputData').value = d.toISOString().split('T')[0];
+            atualizarData();
+        }
+
         function agendarSlot(horario) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -447,7 +443,6 @@
 
             const chaveData = getDataAtualChave();
 
-            // Salva diretamente no Firebase Realtime Database
             refReservas.child(chaveData).child(horario.replace(':', 'h')).set({
                 horarioOriginal: horario,
                 responsavel: usuarioSessao.nome,
@@ -473,14 +468,13 @@
             const ehProprioCriador = reservaAtual.responsavel === usuarioSessao.nome;
             let aviso = ehProprioCriador 
                 ? `Você está cancelando seu agendamento das ${horario}.` 
-                : `ATENÇÃO: Este agendamento pertence a ${reservaAtual.responsavel}.\nO cancelamento por terceiros será REGISTRADO no histórico com seu nome (${usuarioSessao.nome}).`;
+                : `ATENÇÃO: Este agendamento pertence a ${reservaAtual.responsavel}.\nO cancelamento por terceiros será REGISTRADO com seu nome (${usuarioSessao.nome}).`;
 
             if (!confirm(`${aviso}\n\nDeseja realmente prosseguir?`)) return;
 
-            const motivo = prompt("Digite o motivo do cancelamento para registro de auditoria:");
+            const motivo = prompt("Digite o motivo do cancelamento para auditoria:");
             if (motivo === null) return;
 
-            // Registrar log no Firebase
             refLogs.push({
                 dataReuniao: chaveData,
                 horario: horario,
@@ -492,10 +486,24 @@
                 timestamp: new Date().toISOString()
             });
 
-            // Remover do Firebase Realtime Database
             refReservas.child(chaveData).child(chaveHorario).remove();
+            alert(`Agendamento cancelado com sucesso.`);
+        }
 
-            alert(`Agendamento cancelado e registrado no histórico de auditoria da Copa Energia.`);
+        function obterHorarioAtualHHMM() {
+            const agora = new Date();
+            const h = String(agora.getHours()).padStart(2, '0');
+            const m = String(agora.getMinutes()).padStart(2, '0');
+            return `${h}:${m}`;
+        }
+
+        function ehHorarioAtual(horarioString, dataChave) {
+            const hojeData = new Date().toISOString().split('T')[0];
+            if (dataChave !== hojeData) return false;
+
+            const agoraHHMM = obterHorarioAtualHHMM();
+            const [inicio, fim] = horarioString.split(' - ');
+            return agoraHHMM >= inicio && agoraHHMM < fim;
         }
 
         function renderTabela() {
@@ -504,16 +512,32 @@
             const chaveData = getDataAtualChave();
             const reservasHoje = reservas[chaveData] || {};
 
+            let countLivres = 0;
+            let countOcupados = 0;
+
             horarios.forEach((horario, index) => {
                 const tr = document.createElement('tr');
                 const chaveHorario = horario.replace(':', 'h');
                 const reserva = reservasHoje[chaveHorario];
+                const estaAcontecendoAgora = ehHorarioAtual(horario, chaveData);
+
+                if (reserva) countOcupados++;
+                else countLivres++;
+
                 tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+                if (estaAcontecendoAgora) {
+                    tr.className += ' bg-amber-50/90 border-l-4 border-l-copa-orange';
+                }
+
+                const badgeAgora = estaAcontecendoAgora 
+                    ? `<span class="bg-copa-orange text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider block mt-1 animate-pulse">Agora</span>`
+                    : '';
 
                 if (reserva) {
                     tr.innerHTML = `
-                        <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-copa-teal bg-orange-50/50">
+                        <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-copa-teal bg-orange-50/40">
                             ${horario}
+                            ${badgeAgora}
                         </td>
                         <td class="py-2.5 px-3 border border-slate-200 font-bold text-slate-800">
                             <div class="flex items-center gap-1.5">
@@ -537,6 +561,7 @@
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-copa-teal">
                             ${horario}
+                            ${badgeAgora}
                         </td>
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">Disponível</td>
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
@@ -552,15 +577,10 @@
                 tbody.appendChild(tr);
             });
 
+            document.getElementById('badgeLivres').innerText = `${countLivres} Livres`;
+            document.getElementById('badgeOcupados').innerText = `${countOcupados} Ocupados`;
+
             lucide.createIcons();
-        }
-
-        function atualizarCabecalho() {
-            const sala = document.getElementById('inputSala').value || '___________________________';
-            const capacidade = document.getElementById('inputCapacidade').value || '8 Lugares';
-
-            document.getElementById('displaySala').innerText = sala;
-            document.getElementById('displayCapacidade').innerText = capacidade;
         }
 
         function atualizarData() {
@@ -602,12 +622,10 @@
             document.getElementById('modalHistorico').classList.add('hidden');
         }
 
-        // Inicialização
         document.addEventListener('DOMContentLoaded', () => {
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('inputData').value = hoje;
             
-            atualizarCabecalho();
             atualizarData();
             atualizarHeaderUsuario();
             inicializarFirebaseListeners();
