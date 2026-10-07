@@ -133,10 +133,11 @@
 
         <hr class="border-slate-200 dark:border-slate-700">
 
-        <!-- Seleção de Visão, Data e Filtros -->
-        <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between text-xs">
-            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                <div class="bg-slate-100 dark:bg-slate-700 p-1 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center gap-1 w-full sm:w-auto justify-center">
+        <!-- Seleção de Visão, Data e Filtros Organizados -->
+        <div class="flex flex-col gap-3 text-xs">
+            <!-- Linha 1: Visão Diária/Semanal + Data -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+                <div class="bg-slate-100 dark:bg-slate-700 p-1 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center gap-1 w-full sm:w-auto">
                     <button id="btnVisaoDia" onclick="alternarVisao('dia')" class="flex-1 sm:flex-none bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition text-center">
                         Visão Diária
                     </button>
@@ -145,29 +146,27 @@
                     </button>
                 </div>
 
-                <div class="flex items-center gap-2 w-full sm:w-auto mt-1 sm:mt-0">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
                     <label class="font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap text-xs">Data:</label>
                     <input type="date" id="inputData" onchange="atualizarData()" class="w-full sm:w-auto border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2 font-semibold text-copa-teal focus:ring-2 focus:ring-copa-orange focus:outline-none text-xs">
                 </div>
             </div>
 
-            <!-- Atalhos Rápidos e Filtros Mobile -->
-            <div class="flex flex-wrap items-center justify-between sm:justify-end gap-1.5 w-full sm:w-auto">
-                <div class="flex items-center gap-1">
-                    <button onclick="definirDataAtalho(0)" class="bg-slate-100 dark:bg-slate-700 hover:bg-copa-lightOrange dark:hover:bg-slate-600 hover:text-copa-orange text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] whitespace-nowrap">
-                        Hoje
-                    </button>
-                    <button onclick="definirDataAtalho(1)" class="bg-slate-100 dark:bg-slate-700 hover:bg-copa-lightOrange dark:hover:bg-slate-600 hover:text-copa-orange text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] whitespace-nowrap">
-                        Amanhã
-                    </button>
-                </div>
+            <!-- Linha 2: Botões de Filtros e Atalhos em Grid Perfeito no Mobile -->
+            <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-end gap-1.5 w-full">
+                <button onclick="definirDataAtalho(0)" class="bg-slate-100 dark:bg-slate-700 hover:bg-copa-lightOrange dark:hover:bg-slate-600 hover:text-copa-orange text-slate-700 dark:text-slate-200 font-bold px-2.5 py-2 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] text-center">
+                    Hoje
+                </button>
+                <button onclick="definirDataAtalho(1)" class="bg-slate-100 dark:bg-slate-700 hover:bg-copa-lightOrange dark:hover:bg-slate-600 hover:text-copa-orange text-slate-700 dark:text-slate-200 font-bold px-2.5 py-2 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] text-center">
+                    Amanhã
+                </button>
 
-                <button id="btnFiltroMinhas" onclick="toggleFiltroMinhasReunioes()" class="bg-slate-100 dark:bg-slate-700 hover:bg-amber-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center gap-1 whitespace-nowrap">
+                <button id="btnFiltroMinhas" onclick="toggleFiltroMinhasReunioes()" class="bg-slate-100 dark:bg-slate-700 hover:bg-amber-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-2 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center justify-center gap-1">
                     <i data-lucide="user" class="w-3.5 h-3.5 text-copa-orange"></i>
                     <span id="labelFiltroMinhas">Minhas</span>
                 </button>
 
-                <button id="btnFiltroLivres" onclick="toggleFiltroApenasLivres()" class="bg-slate-100 dark:bg-slate-700 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center gap-1 whitespace-nowrap">
+                <button id="btnFiltroLivres" onclick="toggleFiltroApenasLivres()" class="bg-slate-100 dark:bg-slate-700 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-2 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center justify-center gap-1">
                     <i data-lucide="filter" class="w-3.5 h-3.5 text-copa-orange"></i>
                     <span id="labelFiltroLivres">Livres</span>
                 </button>
@@ -299,7 +298,7 @@
         </div>
     </div>
 
-    <!-- NAVEGAÇÃO FIXA MOBILE (BARRA INFERIOR / THUMB ZONE) -->
+    <!-- NAVEGAÇÃO FIXA MOBILE (BARRA INFERIOR) -->
     <div class="no-print fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 p-2 sm:hidden z-40 flex items-center justify-around shadow-lg">
         <button onclick="abrirModalNovaReserva()" class="flex flex-col items-center gap-0.5 text-copa-orange font-bold text-[10px]">
             <div class="p-1.5 bg-copa-lightOrange dark:bg-orange-950/60 rounded-full">
@@ -628,18 +627,18 @@
             const labelMinhas = document.getElementById('labelFiltroMinhas');
 
             if (filtroApenasLivres) {
-                btnLivres.className = "bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1 shadow-sm";
-                labelLivres.innerText = "Apenas Livres";
+                btnLivres.className = "bg-emerald-600 text-white font-bold px-2.5 py-2 sm:py-1.5 rounded-lg transition text-[11px] flex items-center justify-center gap-1 shadow-sm";
+                labelLivres.innerText = "Livres";
             } else {
-                btnLivres.className = "bg-slate-100 dark:bg-slate-700 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center gap-1";
+                btnLivres.className = "bg-slate-100 dark:bg-slate-700 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-2 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center justify-center gap-1";
                 labelLivres.innerText = "Livres";
             }
 
             if (filtroMinhasReunioes) {
-                btnMinhas.className = "bg-copa-orange text-white font-bold px-2.5 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1 shadow-sm";
-                labelMinhas.innerText = "Minhas Reuniões";
+                btnMinhas.className = "bg-copa-orange text-white font-bold px-2.5 py-2 sm:py-1.5 rounded-lg transition text-[11px] flex items-center justify-center gap-1 shadow-sm";
+                labelMinhas.innerText = "Minhas";
             } else {
-                btnMinhas.className = "bg-slate-100 dark:bg-slate-700 hover:bg-amber-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center gap-1";
+                btnMinhas.className = "bg-slate-100 dark:bg-slate-700 hover:bg-amber-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-2 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center justify-center gap-1";
                 labelMinhas.innerText = "Minhas";
             }
         }
@@ -1027,7 +1026,6 @@
                     tr.className += ' bg-amber-100/80 dark:bg-amber-950/60 border-l-4 border-l-copa-orange font-semibold';
                 }
 
-                // BADGE "AGORA" ALINHADO NA MESMA LINHA
                 const badgeAgora = estaAcontecendoAgora 
                     ? `<span class="bg-copa-orange text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse inline-block">Agora</span>`
                     : '';
