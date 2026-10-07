@@ -109,7 +109,7 @@
                     <i data-lucide="sliders" class="w-5 h-5 text-copa-orange"></i>
                     Painel de Gerenciamento da Sala
                 </h2>
-                <p class="text-xs text-slate-500">Navegação por data (dias atuais e futuros) e agendamento em bloco.</p>
+                <p class="text-xs text-slate-500">Consulta de histórico e agendamento de reuniões corporativas.</p>
             </div>
             <div class="flex flex-wrap gap-2">
                 <button onclick="abrirModalNovaReserva()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
@@ -947,7 +947,9 @@
             const tbody = document.getElementById('tabelaHorarios');
             tbody.innerHTML = '';
             const chaveData = getDataAtualChave();
+            const hojeData = new Date().toISOString().split('T')[0];
             const reservasHoje = reservas[chaveData] || {};
+            const ehDataPassada = chaveData < hojeData;
 
             horarios.forEach((horario, index) => {
                 const chaveHorario = horario.replace(':', 'h');
@@ -969,7 +971,6 @@
                     : '';
 
                 if (reserva) {
-                    // SE A REUNIÃO JÁ TERMINOU (PASSADO): NÃO EXIBE O BOTÃO EXCLUIR
                     const botaoAcaoReserva = passado 
                         ? `<span class="text-slate-400 text-[10px] font-bold uppercase">Concluído</span>`
                         : `<button onclick="abrirModalCancelarSlot('${horario}')" class="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
@@ -1018,9 +1019,13 @@
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
                         <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
                         <td class="py-2.5 px-3 border border-slate-200 text-center no-print">
-                            <button onclick="abrirModalNovaReserva('${horario}')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
-                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Reservar
-                            </button>
+                            ${
+                                ehDataPassada
+                                ? `<span class="text-slate-300 text-[10px] font-bold uppercase">-</span>`
+                                : `<button onclick="abrirModalNovaReserva('${horario}')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
+                                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Reservar
+                                   </button>`
+                            }
                         </td>
                     `;
                 }
@@ -1073,16 +1078,13 @@
         }
 
         function atualizarData() {
-            const dataInput = document.getElementById('inputData');
-            const hojeData = new Date().toISOString().split('T')[0];
-
-            if (dataInput.value && dataInput.value < hojeData) {
-                dataInput.value = hojeData;
+            const dataInput = document.getElementById('inputData').value;
+            if (dataInput) {
+                const [ano, mes, dia] = dataInput.split('-');
+                document.getElementById('displayData').innerText = `${dia}/${mes}/${ano}`;
+            } else {
+                document.getElementById('displayData').innerText = '___ / ___ / ______';
             }
-
-            const dataFinal = dataInput.value || hojeData;
-            const [ano, mes, dia] = dataFinal.split('-');
-            document.getElementById('displayData').innerText = `${dia}/${mes}/${ano}`;
             renderTabela();
         }
 
@@ -1119,7 +1121,6 @@
             const inputDataElem = document.getElementById('inputData');
 
             inputDataElem.value = hoje;
-            inputDataElem.min = hoje;
 
             atualizarData();
             atualizarHeaderUsuario();
