@@ -95,6 +95,9 @@
             </div>
         </div>
         <div class="flex items-center gap-1.5 flex-shrink-0">
+            <button onclick="solicitarPermissaoNotificacao()" class="p-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg transition-colors shadow-sm" title="Ativar Notificações no Telemóvel">
+                <i data-lucide="bell" id="iconeNotificacao" class="w-4 h-4 text-amber-300"></i>
+            </button>
             <button onclick="alternarModoEscuro()" class="p-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg transition-colors shadow-sm" title="Alternar Modo Escuro/Claro">
                 <i data-lucide="moon" id="iconeTheme" class="w-4 h-4"></i>
             </button>
@@ -135,7 +138,6 @@
 
         <!-- Seleção de Visão, Data e Filtros Organizados -->
         <div class="flex flex-col gap-3 text-xs">
-            <!-- Linha 1: Visão Diária/Semanal + Data -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
                 <div class="bg-slate-100 dark:bg-slate-700 p-1 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center gap-1 w-full sm:w-auto">
                     <button id="btnVisaoDia" onclick="alternarVisao('dia')" class="flex-1 sm:flex-none bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition text-center">
@@ -152,7 +154,6 @@
                 </div>
             </div>
 
-            <!-- Linha 2: Botões de Filtros e Atalhos em Grid Perfeito no Mobile -->
             <div class="grid grid-cols-2 sm:flex sm:flex-wrap items-center justify-end gap-1.5 w-full">
                 <button onclick="definirDataAtalho(0)" class="bg-slate-100 dark:bg-slate-700 hover:bg-copa-lightOrange dark:hover:bg-slate-600 hover:text-copa-orange text-slate-700 dark:text-slate-200 font-bold px-2.5 py-2 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] text-center">
                     Hoje
@@ -320,9 +321,9 @@
         </button>
     </div>
 
-    <!-- MODAL 1: IDENTIFICAÇÃO DO COLABORADOR -->
+    <!-- MODAIS DO SISTEMA -->
     <div id="modalIdentificacao" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
-        <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-copa-orange text-slate-800 dark:text-slate-100 animate-in slide-in-from-bottom sm:zoom-in-95">
+        <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-copa-orange text-slate-800 dark:text-slate-100">
             <div class="flex items-center gap-3 mb-3">
                 <div class="w-10 h-10 bg-copa-lightOrange dark:bg-orange-950/50 rounded-lg flex items-center justify-center text-copa-orange">
                     <i data-lucide="user-check" class="w-6 h-6"></i>
@@ -360,7 +361,6 @@
         </div>
     </div>
 
-    <!-- MODAL 2: AGENDAMENTO DE HORÁRIO -->
     <div id="modalNovaReserva" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
         <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-copa-orange text-slate-800 dark:text-slate-100">
             <div class="flex justify-between items-center mb-3">
@@ -408,7 +408,6 @@
         </div>
     </div>
 
-    <!-- MODAL 3: CONFIRMAÇÃO DE SUCESSO -->
     <div id="modalSucessoReserva" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
         <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-emerald-500 text-center text-slate-800 dark:text-slate-100">
             <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -434,7 +433,6 @@
         </div>
     </div>
 
-    <!-- MODAL 4: CANCELAMENTO COM PIN -->
     <div id="modalCancelarReserva" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
         <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-rose-600 text-slate-800 dark:text-slate-100">
             <h3 class="text-base font-bold text-copa-teal dark:text-amber-400 mb-2 flex items-center gap-2">
@@ -464,7 +462,6 @@
         </div>
     </div>
 
-    <!-- MODAL 5: HISTÓRICO DE AUDITORIA -->
     <div id="modalHistorico" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
         <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-2xl w-full p-5 shadow-2xl border-t-4 border-copa-teal text-slate-800 dark:text-slate-100">
             <div class="flex justify-between items-center mb-3">
@@ -484,7 +481,7 @@
                             <th class="p-2">Data/Hora</th>
                             <th class="p-2">Reservou</th>
                             <th class="p-2">Cancelou</th>
-                            <th class="p-2">Motivo</th>
+                            <th class="p-2.5">Motivo</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaLogsHistorico">
@@ -523,6 +520,53 @@
         let filtroMinhasReunioes = false;
         let slotParaCancelar = null;
         let dadosUltimaReserva = null;
+        let notificacaoEnviadaHoje = {};
+
+        function solicitarPermissaoNotificacao() {
+            if (!("Notification" in window)) {
+                alert("Este navegador não suporta notificações de sistema.");
+                return;
+            }
+
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    alert("Notificações ativadas! Você receberá um aviso no telemóvel quando faltarem 5 minutos para terminar a sua reunião.");
+                } else {
+                    alert("Permissão de notificação negada.");
+                }
+            });
+        }
+
+        function verificarNotificacaoTermino(horarioSlot, reserva) {
+            if (Notification.permission !== "granted") return;
+            if (!usuarioSessao || reserva.email !== usuarioSessao.email) return;
+
+            const agora = new Date();
+            const [hFim, mFim] = horarioSlot.split(' - ')[1].split(':').map(Number);
+            const dataFim = new Date();
+            dataFim.setHours(hFim, mFim, 0, 0);
+
+            const diffMinutos = Math.floor((dataFim - agora) / 60000);
+            const chaveNotif = `${getDataAtualChave()}_${horarioSlot}`;
+
+            if (diffMinutos <= 5 && diffMinutos > 0 && !notificacaoEnviadaHoje[chaveNotif]) {
+                notificacaoEnviadaHoje[chaveNotif] = true;
+                new Notification("Sua Reunião está prestes a terminar! ⏳", {
+                    body: `A reunião "${reserva.assunto}" na Sala Sustentabilidade termina em ${diffMinutos} minutos.`,
+                    icon: "https://unpkg.com/lucide-static@latest/icons/clock.svg"
+                });
+            }
+        }
+
+        function calcularMinutosRestantes(horarioSlot) {
+            const agora = new Date();
+            const [hFim, mFim] = horarioSlot.split(' - ')[1].split(':').map(Number);
+            const dataFim = new Date();
+            dataFim.setHours(hFim, mFim, 0, 0);
+
+            const diffMinutos = Math.ceil((dataFim - agora) / 60000);
+            return diffMinutos > 0 ? diffMinutos : 0;
+        }
 
         function alternarModoEscuro() {
             document.documentElement.classList.toggle('dark');
@@ -893,7 +937,6 @@
             document.getElementById('modalSucessoReserva').classList.add('hidden');
         }
 
-        // CANCELAMENTO AUDITADO COM PIN
         function abrirModalCancelarSlot(horario) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -1024,11 +1067,16 @@
 
                 if (estaAcontecendoAgora) {
                     tr.className += ' bg-amber-100/80 dark:bg-amber-950/60 border-l-4 border-l-copa-orange font-semibold';
+                    if (reserva) {
+                        verificarNotificacaoTermino(horario, reserva);
+                    }
                 }
 
-                const badgeAgora = estaAcontecendoAgora 
-                    ? `<span class="bg-copa-orange text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse inline-block">Agora</span>`
-                    : '';
+                let badgeAgora = '';
+                if (estaAcontecendoAgora) {
+                    const minRestantes = calcularMinutosRestantes(horario);
+                    badgeAgora = `<span class="bg-copa-orange text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse inline-block">Agora (${minRestantes}m restantes)</span>`;
+                }
 
                 if (reserva) {
                     let botoesAcao = '';
@@ -1205,6 +1253,11 @@
             if (!usuarioSessao) {
                 solicitarIdentificacao();
             }
+
+            // Atualização contínua a cada minuto para o tempo restante e notificações
+            setInterval(() => {
+                if (modoVisao === 'dia') renderTabelaDiaria();
+            }, 60000);
         });
     </script>
 </body>
