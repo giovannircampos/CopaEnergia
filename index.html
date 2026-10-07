@@ -857,6 +857,24 @@
             });
 
             const reservasHoje = reservas[chaveData] || {};
+
+            // VALIDAR CONFLITO DE HORÁRIO DO PRÓPRIO UTILIZADOR
+            const jaTemReservaUsuario = Object.values(reservasHoje).some(res => {
+                if (res.email === usuarioSessao.email) {
+                    const [inExistente, fimExistente] = res.horarioOriginal.split(' - ');
+                    return slotsAfetados.some(slot => {
+                        const [inNovo, fimNovo] = slot.split(' - ');
+                        return (inNovo >= inExistente && inNovo < fimExistente);
+                    });
+                }
+                return false;
+            });
+
+            if (jaTemReservaUsuario) {
+                alert('Aviso: Você já possui uma reunião agendada neste mesmo intervalo de tempo.');
+                return;
+            }
+
             const jaReservados = slotsAfetados.filter(slot => reservasHoje[slot.replace(':', 'h')]);
 
             if (jaReservados.length > 0) {
