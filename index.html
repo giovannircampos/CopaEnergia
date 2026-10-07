@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Agendamento de Sala de Reunião - Copa Energia</title>
     <!-- Google Fonts: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -39,7 +40,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
     <style>
-        body { font-family: 'Montserrat', sans-serif; }
+        body { font-family: 'Montserrat', sans-serif; -webkit-tap-highlight-color: transparent; }
         @media print {
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             .no-print { display: none !important; }
@@ -48,7 +49,7 @@
         }
     </style>
 </head>
-<body class="bg-copa-grayBg min-h-screen text-slate-800 p-3 md:p-8">
+<body class="bg-copa-grayBg dark:bg-slate-900 min-h-screen text-slate-800 dark:text-slate-100 p-2 sm:p-4 md:p-8 pb-24 sm:pb-8 transition-colors duration-200">
 
     <!-- FIREBASE INIT -->
     <script>
@@ -70,9 +71,9 @@
     </script>
 
     <!-- Header do Usuário / Sessão -->
-    <div class="no-print max-w-4xl mx-auto mb-4 bg-copa-teal text-white p-4 rounded-xl shadow-md flex flex-wrap items-center justify-between gap-4 border-l-4 border-copa-orange">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 flex items-center justify-center bg-white rounded-lg p-1.5 shadow-sm">
+    <div class="no-print max-w-4xl mx-auto mb-3 sm:mb-4 bg-copa-teal dark:bg-slate-800 text-white p-3.5 sm:p-4 rounded-xl shadow-md flex items-center justify-between gap-2 border-l-4 border-copa-orange">
+        <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-9 h-9 sm:w-10 sm:h-10 flex-shrink-0 flex items-center justify-center bg-white rounded-lg p-1.5 shadow-sm">
                 <svg viewBox="0 0 100 100" class="w-full h-full">
                     <g transform="translate(50,50)">
                         <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" />
@@ -88,92 +89,100 @@
                     </g>
                 </svg>
             </div>
-            <div>
-                <span class="text-[10px] text-amber-200 block font-semibold uppercase tracking-wider">Sessão Ativa</span>
-                <span id="labelUsuarioAtual" class="font-bold text-white text-sm">Não identificado</span>
+            <div class="truncate">
+                <span class="text-[9px] sm:text-[10px] text-amber-200 block font-semibold uppercase tracking-wider">Sessão Ativa</span>
+                <span id="labelUsuarioAtual" class="font-bold text-white text-xs sm:text-sm truncate block">Não identificado</span>
             </div>
         </div>
-        <div class="flex items-center gap-2">
-            <button onclick="solicitarIdentificacao()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-semibold text-xs px-3.5 py-2 rounded-lg transition-colors shadow-sm">
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+            <button onclick="alternarModoEscuro()" class="p-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg transition-colors shadow-sm" title="Alternar Modo Escuro/Claro">
+                <i data-lucide="moon" id="iconeTheme" class="w-4 h-4"></i>
+            </button>
+            <button onclick="solicitarIdentificacao()" class="flex items-center gap-1.5 bg-copa-orange hover:bg-orange-600 text-white font-semibold text-xs px-2.5 py-2 sm:px-3.5 rounded-lg transition-colors shadow-sm">
                 <i data-lucide="user-check" class="w-4 h-4"></i>
-                Trocar Perfil
+                <span class="hidden sm:inline">Trocar Perfil</span>
             </button>
         </div>
     </div>
 
     <!-- Painel de Gerenciamento & Controles -->
-    <div class="no-print max-w-4xl mx-auto mb-6 bg-white p-5 rounded-xl shadow-md border border-slate-200 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-4">
+    <div class="no-print max-w-4xl mx-auto mb-4 bg-white dark:bg-slate-800 p-3.5 sm:p-5 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 space-y-3 sm:space-y-4">
+        <div class="flex items-center justify-between gap-2">
             <div>
-                <h2 class="text-base font-bold text-copa-teal flex items-center gap-2">
-                    <i data-lucide="sliders" class="w-5 h-5 text-copa-orange"></i>
-                    Painel de Gerenciamento da Sala
+                <h2 class="text-sm sm:text-base font-bold text-copa-teal dark:text-amber-400 flex items-center gap-1.5">
+                    <i data-lucide="sliders" class="w-4 h-4 sm:w-5 sm:h-5 text-copa-orange"></i>
+                    Painel da Sala
                 </h2>
-                <p class="text-xs text-slate-500">Consulta de histórico e agendamento de reuniões corporativas.</p>
+                <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Consulta de histórico e agendamento de reuniões corporativas.</p>
             </div>
-            <div class="flex flex-wrap gap-2">
+            <div class="hidden sm:flex flex-wrap gap-2">
                 <button onclick="abrirModalNovaReserva()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
                     <i data-lucide="calendar-plus" class="w-4 h-4"></i>
-                    Nova Reserva em Bloco
+                    Nova Reserva
                 </button>
-                <button onclick="abrirHistoricoModal()" class="flex items-center gap-2 bg-copa-teal hover:bg-copa-darkTeal text-white font-semibold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
+                <button onclick="abrirHistoricoModal()" class="flex items-center gap-2 bg-copa-teal hover:bg-copa-darkTeal dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-semibold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
                     <i data-lucide="history" class="w-4 h-4 text-copa-orange"></i>
                     Auditoria
                 </button>
-                <button onclick="window.print()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm border border-slate-300">
+                <button onclick="window.print()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm border border-slate-300 dark:border-slate-600">
                     <i data-lucide="printer" class="w-4 h-4"></i>
-                    Imprimir / PDF
+                    PDF
                 </button>
             </div>
         </div>
 
-        <hr class="border-slate-200">
+        <hr class="border-slate-200 dark:border-slate-700">
 
         <!-- Seleção de Visão, Data e Filtros -->
-        <div class="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between text-xs">
-            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                <div class="bg-slate-100 p-1 rounded-lg border border-slate-200 flex items-center gap-1">
-                    <button id="btnVisaoDia" onclick="alternarVisao('dia')" class="bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition">
+        <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between text-xs">
+            <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                <div class="bg-slate-100 dark:bg-slate-700 p-1 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center gap-1 w-full sm:w-auto justify-center">
+                    <button id="btnVisaoDia" onclick="alternarVisao('dia')" class="flex-1 sm:flex-none bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition text-center">
                         Visão Diária
                     </button>
-                    <button id="btnVisaoSemana" onclick="alternarVisao('semana')" class="text-slate-600 hover:text-copa-teal font-bold px-3 py-1.5 rounded-md text-[11px] transition">
+                    <button id="btnVisaoSemana" onclick="alternarVisao('semana')" class="flex-1 sm:flex-none text-slate-600 dark:text-slate-300 hover:text-copa-teal font-bold px-3 py-1.5 rounded-md text-[11px] transition text-center">
                         Visão Semanal
                     </button>
                 </div>
 
-                <div class="flex items-center gap-2 ml-0 md:ml-2">
-                    <label class="font-bold text-slate-700 whitespace-nowrap">Data:</label>
-                    <input type="date" id="inputData" onchange="atualizarData()" class="border border-slate-300 rounded-lg p-1.5 font-semibold text-copa-teal focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                <div class="flex items-center gap-2 w-full sm:w-auto mt-1 sm:mt-0">
+                    <label class="font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap text-xs">Data:</label>
+                    <input type="date" id="inputData" onchange="atualizarData()" class="w-full sm:w-auto border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2 font-semibold text-copa-teal focus:ring-2 focus:ring-copa-orange focus:outline-none text-xs">
                 </div>
             </div>
 
-            <!-- Atalhos Rápidos e Filtro de Livres -->
-            <div class="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto">
+            <!-- Atalhos Rápidos e Filtros Mobile -->
+            <div class="flex flex-wrap items-center justify-between sm:justify-end gap-1.5 w-full sm:w-auto">
                 <div class="flex items-center gap-1">
-                    <button onclick="definirDataAtalho(0)" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
+                    <button onclick="definirDataAtalho(0)" class="bg-slate-100 dark:bg-slate-700 hover:bg-copa-lightOrange dark:hover:bg-slate-600 hover:text-copa-orange text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] whitespace-nowrap">
                         Hoje
                     </button>
-                    <button onclick="definirDataAtalho(1)" class="bg-slate-100 hover:bg-copa-lightOrange hover:text-copa-orange text-slate-700 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 transition text-[11px] whitespace-nowrap">
+                    <button onclick="definirDataAtalho(1)" class="bg-slate-100 dark:bg-slate-700 hover:bg-copa-lightOrange dark:hover:bg-slate-600 hover:text-copa-orange text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] whitespace-nowrap">
                         Amanhã
                     </button>
                 </div>
 
-                <button id="btnFiltroLivres" onclick="toggleFiltroApenasLivres()" class="bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 transition text-[11px] flex items-center gap-1 whitespace-nowrap">
+                <button id="btnFiltroMinhas" onclick="toggleFiltroMinhasReunioes()" class="bg-slate-100 dark:bg-slate-700 hover:bg-amber-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center gap-1 whitespace-nowrap">
+                    <i data-lucide="user" class="w-3.5 h-3.5 text-copa-orange"></i>
+                    <span id="labelFiltroMinhas">Minhas</span>
+                </button>
+
+                <button id="btnFiltroLivres" onclick="toggleFiltroApenasLivres()" class="bg-slate-100 dark:bg-slate-700 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center gap-1 whitespace-nowrap">
                     <i data-lucide="filter" class="w-3.5 h-3.5 text-copa-orange"></i>
-                    <span id="labelFiltroLivres">Apenas Livres</span>
+                    <span id="labelFiltroLivres">Livres</span>
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Documento Principal -->
-    <div class="print-container max-w-4xl mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-slate-200">
+    <div class="print-container max-w-4xl mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-xl overflow-hidden border border-slate-200 dark:border-slate-700">
         
         <!-- Topo Marca Copa Energia -->
-        <div class="bg-copa-teal text-white p-6 border-b-4 border-copa-orange relative overflow-hidden">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 relative z-10">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-white p-2 rounded-xl shadow-md flex items-center justify-center flex-shrink-0">
+        <div class="bg-copa-teal text-white p-4 sm:p-6 border-b-4 border-copa-orange relative overflow-hidden">
+            <div class="flex justify-between items-center gap-2 relative z-10">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 sm:w-14 sm:h-14 bg-white p-1.5 rounded-xl shadow-md flex items-center justify-center flex-shrink-0">
                         <svg viewBox="0 0 100 100" class="w-full h-full">
                             <g transform="translate(50,50)">
                                 <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" />
@@ -191,84 +200,71 @@
                     </div>
                     <div>
                         <div class="leading-none">
-                            <span class="text-2xl font-black tracking-tight text-white block">COPA</span>
-                            <span class="text-xl font-light tracking-wide text-white block -mt-1">energia</span>
+                            <span class="text-lg sm:text-2xl font-black tracking-tight text-white block">COPA</span>
+                            <span class="text-sm sm:text-xl font-light tracking-wide text-white block -mt-1">energia</span>
                         </div>
-                        <p class="text-copa-orange text-[10px] font-bold tracking-widest uppercase mt-2">
-                            ENERGIA DO BRASILEIRO
-                        </p>
                     </div>
                 </div>
-                <div class="bg-copa-orange text-white font-extrabold text-xs px-4 py-2.5 rounded-lg uppercase tracking-wider shadow-md">
-                    Agendamento de Sala
+                <div class="bg-copa-orange text-white font-extrabold text-[10px] sm:text-xs px-3 py-2 rounded-lg uppercase tracking-wider shadow-md text-center">
+                    Sala Sustentabilidade
                 </div>
             </div>
         </div>
 
-        <div class="p-6">
+        <div class="p-3 sm:p-6">
             <!-- Bloco de Informações da Sala -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded-xl border-l-4 border-copa-orange shadow-sm">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-emerald-100/60 rounded-lg text-copa-teal">
-                        <i data-lucide="door-open" class="w-5 h-5"></i>
-                    </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mb-3 sm:mb-4 bg-slate-50 dark:bg-slate-700/50 p-3 sm:p-4 rounded-xl border-l-4 border-copa-orange shadow-sm text-xs">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="door-open" class="w-4 h-4 text-copa-teal dark:text-emerald-400"></i>
                     <div>
-                        <span class="block text-[10px] font-bold text-copa-teal uppercase tracking-wider">Sala / Identificação</span>
-                        <span id="displaySala" class="text-sm font-bold text-slate-800">Sala Sustentabilidade</span>
+                        <span class="block text-[9px] font-bold text-copa-teal dark:text-emerald-400 uppercase">Sala</span>
+                        <span id="displaySala" class="font-bold text-slate-800 dark:text-slate-100 text-xs">Sustentabilidade</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-orange-100/60 rounded-lg text-copa-orange">
-                        <i data-lucide="users" class="w-5 h-5"></i>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="users" class="w-4 h-4 text-copa-orange"></i>
                     <div>
-                        <span class="block text-[10px] font-bold text-copa-teal uppercase tracking-wider">Capacidade</span>
-                        <span id="displayCapacidade" class="text-sm font-bold text-copa-orange">6 Lugares</span>
+                        <span class="block text-[9px] font-bold text-copa-teal dark:text-amber-400 uppercase">Capacidade</span>
+                        <span id="displayCapacidade" class="font-bold text-copa-orange text-xs">6 Lugares</span>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-emerald-100/60 rounded-lg text-copa-teal">
-                        <i data-lucide="calendar" class="w-5 h-5"></i>
-                    </div>
+                <div class="col-span-2 sm:col-span-1 flex items-center gap-2 mt-1 sm:mt-0 pt-1 sm:pt-0 border-t sm:border-0 border-slate-200 dark:border-slate-600">
+                    <i data-lucide="calendar" class="w-4 h-4 text-copa-teal dark:text-emerald-400"></i>
                     <div>
-                        <span class="block text-[10px] font-bold text-copa-teal uppercase tracking-wider">Data Selecionada</span>
-                        <span id="displayData" class="text-sm font-bold text-slate-800">___ / ___ / ______</span>
+                        <span class="block text-[9px] font-bold text-copa-teal dark:text-emerald-400 uppercase">Data Selecionada</span>
+                        <span id="displayData" class="font-bold text-slate-800 dark:text-slate-100 text-xs">___ / ___ / ______</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Chips de Recursos e Destaque da Próxima Reunião -->
-            <div class="mb-6 flex flex-wrap items-center justify-between gap-2 text-[11px] font-bold text-slate-600 border-b border-slate-100 pb-4">
-                <div class="flex flex-wrap gap-2">
-                    <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="users" class="w-3.5 h-3.5 text-copa-orange"></i> 6 Lugares</span>
-                    <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="wifi" class="w-3.5 h-3.5 text-copa-orange"></i> Wi-Fi Corporativo</span>
-                    <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="tv" class="w-3.5 h-3.5 text-copa-orange"></i> TV / Cabo HDMI</span>
-                    <span class="bg-slate-100 px-3 py-1 rounded-full flex items-center gap-1.5"><i data-lucide="thermometer" class="w-3.5 h-3.5 text-copa-orange"></i> Ar-Condicionado</span>
+            <!-- INDICADOR DE TAXA DE OCUPAÇÃO -->
+            <div class="mb-4 bg-slate-100 dark:bg-slate-700/60 p-2.5 sm:p-3 rounded-xl border border-slate-200 dark:border-slate-600 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div class="flex items-center justify-between w-full sm:w-auto text-xs font-bold text-slate-700 dark:text-slate-200">
+                    <div class="flex items-center gap-1.5">
+                        <i data-lucide="pie-chart" class="w-4 h-4 text-copa-orange"></i>
+                        <span>Ocupação: <span id="labelOcupacaoPercent" class="text-copa-orange font-extrabold">0%</span></span>
+                    </div>
+                    <span id="labelOcupacaoDetalhe" class="text-[10px] font-normal text-slate-500 dark:text-slate-400 sm:ml-2">(0/20)</span>
                 </div>
-                <div id="cardProximaReuniao" class="hidden bg-emerald-50 text-emerald-800 px-3 py-1 rounded-lg border border-emerald-200 flex items-center gap-1.5">
-                    <i data-lucide="clock" class="w-3.5 h-3.5 text-emerald-600"></i>
-                    <span id="labelProximaReuniao">Próxima Reunião: --:--</span>
+                <div class="w-full sm:w-48 bg-slate-200 dark:bg-slate-600 h-2 rounded-full overflow-hidden">
+                    <div id="barOcupacao" class="bg-copa-orange h-full transition-all duration-500" style="width: 0%"></div>
                 </div>
             </div>
 
             <!-- ÁREA DA GRADE (DIÁRIA OU SEMANAL) -->
             <div id="containerGradeDiaria">
-                <div class="overflow-x-auto rounded-lg border border-slate-200">
+                <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
                     <table class="w-full text-left border-collapse text-xs">
-                        <thead>
-                            <tr class="bg-copa-teal text-white">
-                                <th class="py-3 px-3 border-b border-copa-teal text-center text-copa-orange font-bold w-32">
-                                    <span class="flex items-center justify-center gap-1">
-                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i> Horário
-                                    </span>
-                                </th>
-                                <th class="py-3 px-3 border-b border-copa-teal font-semibold">Responsável / Colaborador</th>
-                                <th class="py-3 px-3 border-b border-copa-teal font-semibold w-36">Setor</th>
-                                <th class="py-3 px-3 border-b border-copa-teal font-semibold w-48">Assunto / Projeto</th>
-                                <th class="py-3 px-3 border-b border-copa-teal text-center font-semibold w-28 no-print">Ação</th>
+                        <thead class="hidden sm:table-header-group">
+                            <tr class="bg-copa-teal dark:bg-slate-900 text-white">
+                                <th class="py-3 px-3 border-b border-copa-teal dark:border-slate-700 text-center text-copa-orange font-bold w-36">Horário</th>
+                                <th class="py-3 px-3 border-b border-copa-teal dark:border-slate-700 font-semibold">Responsável</th>
+                                <th class="py-3 px-3 border-b border-copa-teal dark:border-slate-700 font-semibold w-36">Setor</th>
+                                <th class="py-3 px-3 border-b border-copa-teal dark:border-slate-700 font-semibold w-48">Assunto</th>
+                                <th class="py-3 px-3 border-b border-copa-teal dark:border-slate-700 text-center font-semibold w-40 no-print">Ação</th>
                             </tr>
                         </thead>
-                        <tbody id="tabelaHorarios">
+                        <tbody id="tabelaHorarios" class="divide-y divide-slate-200 dark:divide-slate-700 sm:divide-y-0">
                             <!-- Conteúdo JS -->
                         </tbody>
                     </table>
@@ -276,20 +272,16 @@
             </div>
 
             <div id="containerGradeSemanal" class="hidden space-y-4">
-                <div class="flex items-center justify-between bg-slate-100 p-3 rounded-lg text-xs font-bold text-copa-teal">
-                    <span>Visão Semanal de Ocupação</span>
-                    <span id="labelIntervaloSemana" class="text-copa-orange">Segunda a Sexta</span>
-                </div>
-                <div class="overflow-x-auto border border-slate-200 rounded-lg">
+                <div class="overflow-x-auto border border-slate-200 dark:border-slate-700 rounded-lg">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="bg-copa-teal text-white text-center">
-                                <th class="p-2.5 border-b border-copa-teal font-bold w-24">Horário</th>
-                                <th class="p-2.5 border-b border-copa-teal font-semibold">Segunda</th>
-                                <th class="p-2.5 border-b border-copa-teal font-semibold">Terça</th>
-                                <th class="p-2.5 border-b border-copa-teal font-semibold">Quarta</th>
-                                <th class="p-2.5 border-b border-copa-teal font-semibold">Quinta</th>
-                                <th class="p-2.5 border-b border-copa-teal font-semibold">Sexta</th>
+                            <tr class="bg-copa-teal dark:bg-slate-900 text-white text-center">
+                                <th class="p-2 border-b border-copa-teal dark:border-slate-700 font-bold min-w-[70px]">Hora</th>
+                                <th class="p-2 border-b border-copa-teal dark:border-slate-700 font-semibold">Seg</th>
+                                <th class="p-2 border-b border-copa-teal dark:border-slate-700 font-semibold">Ter</th>
+                                <th class="p-2 border-b border-copa-teal dark:border-slate-700 font-semibold">Qua</th>
+                                <th class="p-2 border-b border-copa-teal dark:border-slate-700 font-semibold">Qui</th>
+                                <th class="p-2 border-b border-copa-teal dark:border-slate-700 font-semibold">Sex</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaSemanal">
@@ -300,212 +292,209 @@
             </div>
 
             <!-- Rodapé Institucional -->
-            <div class="mt-8 pt-4 border-t border-slate-200 text-center text-[11px] font-semibold text-copa-teal flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <div class="w-4 h-4">
-                        <svg viewBox="0 0 100 100" class="w-full h-full">
-                            <g transform="translate(50,50)">
-                                <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" />
-                                <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" transform="rotate(72)" />
-                                <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" transform="rotate(144)" />
-                                <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" transform="rotate(216)" />
-                                <path d="M0,-42 C12,-38 18,-24 12,-12 C6,-22 0,-32 0,-42" fill="#FA8432" transform="rotate(288)" />
-                            </g>
-                        </svg>
-                    </div>
-                    <span>Copa Energia — Uso Exclusivo Interno</span>
-                </div>
-                <span class="text-slate-400 font-normal">Sistema de Agendamento Auditado</span>
+            <div class="mt-6 pt-3 border-t border-slate-200 dark:border-slate-700 text-center text-[10px] font-semibold text-copa-teal dark:text-slate-400 flex justify-between items-center">
+                <span>Copa Energia — Uso Interno</span>
+                <span class="text-slate-400 dark:text-slate-500 font-normal">Auditado</span>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 1: IDENTIFICAÇÃO DO COLABORADOR COM E-MAIL CORPORATIVO -->
-    <div id="modalIdentificacao" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-copa-orange">
+    <!-- NAVEGAÇÃO FIXA MOBILE (BARRA INFERIOR / THUMB ZONE) -->
+    <div class="no-print fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 p-2 sm:hidden z-40 flex items-center justify-around shadow-lg">
+        <button onclick="abrirModalNovaReserva()" class="flex flex-col items-center gap-0.5 text-copa-orange font-bold text-[10px]">
+            <div class="p-1.5 bg-copa-lightOrange dark:bg-orange-950/60 rounded-full">
+                <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+            </div>
+            <span>Reservar</span>
+        </button>
+        <button onclick="toggleFiltroMinhasReunioes()" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 font-bold text-[10px]">
+            <div class="p-1.5 bg-slate-100 dark:bg-slate-700 rounded-full">
+                <i data-lucide="user" class="w-5 h-5"></i>
+            </div>
+            <span>Minhas</span>
+        </button>
+        <button onclick="abrirHistoricoModal()" class="flex flex-col items-center gap-0.5 text-slate-600 dark:text-slate-300 font-bold text-[10px]">
+            <div class="p-1.5 bg-slate-100 dark:bg-slate-700 rounded-full">
+                <i data-lucide="history" class="w-5 h-5"></i>
+            </div>
+            <span>Auditoria</span>
+        </button>
+    </div>
+
+    <!-- MODAL 1: IDENTIFICAÇÃO DO COLABORADOR -->
+    <div id="modalIdentificacao" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-copa-orange text-slate-800 dark:text-slate-100 animate-in slide-in-from-bottom sm:zoom-in-95">
             <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 bg-copa-lightOrange rounded-lg flex items-center justify-center text-copa-orange">
+                <div class="w-10 h-10 bg-copa-lightOrange dark:bg-orange-950/50 rounded-lg flex items-center justify-center text-copa-orange">
                     <i data-lucide="user-check" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-copa-teal">Identificação do Colaborador</h3>
-                    <p class="text-xs text-slate-500">Sua conta corporativa da Copa Energia</p>
+                    <h3 class="text-base font-bold text-copa-teal dark:text-amber-400">Identificação</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Dados corporativos da Copa Energia</p>
                 </div>
             </div>
-
-            <p class="text-xs text-slate-600 mb-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
-                Informe seus dados corporativos para habilitar a gestão das suas reuniões.
-            </p>
 
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nome Completo *</label>
-                    <input type="text" id="inputNomeUsuario" placeholder="Ex: Ruthielen Elis Soares" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Nome Completo *</label>
+                    <input type="text" id="inputNomeUsuario" placeholder="Ex: Ruthielen Elis Soares" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Setor / Área *</label>
-                    <input type="text" id="inputSetorUsuario" placeholder="Ex: Operações / C.O. SJC" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Setor / Área *</label>
+                    <input type="text" id="inputSetorUsuario" placeholder="Ex: Operações / C.O. SJC" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">E-mail Corporativo (@copaenergia.com.br) *</label>
-                    <input type="email" id="inputEmailUsuario" placeholder="usuario@copaenergia.com.br" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">E-mail Corporativo (@copaenergia.com.br) *</label>
+                    <input type="email" id="inputEmailUsuario" placeholder="usuario@copaenergia.com.br" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">PIN de Segurança (4 Números) *</label>
-                    <input type="password" id="inputPinUsuario" maxlength="4" placeholder="Ex: 1234" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">PIN (4 Números) *</label>
+                    <input type="password" id="inputPinUsuario" maxlength="4" placeholder="Ex: 1234" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
             </div>
 
-            <div class="mt-6">
-                <button onclick="salvarIdentificacao()" class="w-full bg-copa-orange hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-colors shadow-sm text-xs">
-                    Confirmar e Acessar Agenda
+            <div class="mt-5">
+                <button onclick="salvarIdentificacao()" class="w-full bg-copa-orange hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-colors shadow-sm text-xs min-h-[44px]">
+                    Confirmar e Acessar
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: AGENDAMENTO DE HORÁRIO / BLOCO DE HORÁRIOS -->
-    <div id="modalNovaReserva" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-copa-orange">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-bold text-copa-teal flex items-center gap-2">
+    <!-- MODAL 2: AGENDAMENTO DE HORÁRIO -->
+    <div id="modalNovaReserva" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-copa-orange text-slate-800 dark:text-slate-100">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-bold text-copa-teal dark:text-amber-400 flex items-center gap-2">
                     <i data-lucide="calendar-plus" class="w-5 h-5 text-copa-orange"></i>
-                    Nova Reserva de Sala
+                    Nova Reserva
                 </h3>
-                <button onclick="fecharModalNovaReserva()" class="text-slate-400 hover:text-slate-600">
+                <button onclick="fecharModalNovaReserva()" class="p-1 text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Assunto / Título da Reunião *</label>
-                    <input type="text" id="inputAssuntoReserva" placeholder="Ex: Alinhamento de Operações SJC" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none">
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Assunto / Título *</label>
+                    <input type="text" id="inputAssuntoReserva" placeholder="Ex: Alinhamento de Operações" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none">
                 </div>
 
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Horário Início *</label>
-                        <select id="selectHoraInicio" onchange="atualizarOpcoesHoraFim()" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none font-semibold text-copa-teal">
-                            <!-- Opções JS dinâmicas com apenas livres -->
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Início *</label>
+                        <select id="selectHoraInicio" onchange="atualizarOpcoesHoraFim()" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none font-semibold text-copa-teal dark:text-amber-400">
                         </select>
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Horário Fim *</label>
-                        <select id="selectHoraFim" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-copa-orange focus:outline-none font-semibold text-copa-teal">
-                            <!-- Opções JS dinâmicas com apenas livres -->
+                        <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Fim *</label>
+                        <select id="selectHoraFim" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none font-semibold text-copa-teal dark:text-amber-400">
                         </select>
                     </div>
                 </div>
 
                 <div id="avisoSemHorarios" class="hidden bg-rose-50 text-rose-700 p-2.5 rounded-lg border border-rose-200 text-[11px] font-bold">
-                    Não há horários disponíveis para agendamento na data selecionada.
-                </div>
-
-                <div class="bg-copa-lightOrange p-3 rounded-lg border border-copa-borderOrange text-[11px] text-amber-950 flex items-start gap-2">
-                    <i data-lucide="info" class="w-4 h-4 text-copa-orange flex-shrink-0 mt-0.5"></i>
-                    <span>O sistema exibe estritamente os horários livres para reserva na data selecionada.</span>
+                    Não há horários disponíveis nesta data.
                 </div>
             </div>
 
-            <div class="mt-6 flex justify-end gap-2">
-                <button onclick="fecharModalNovaReserva()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-lg text-xs">
+            <div class="mt-5 flex gap-2">
+                <button onclick="fecharModalNovaReserva()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-lg text-xs min-h-[44px]">
                     Cancelar
                 </button>
-                <button id="btnConfirmarReservaBloco" onclick="confirmarAgendamentoBloco()" class="bg-copa-orange hover:bg-orange-600 text-white font-bold px-5 py-2.5 rounded-lg text-xs shadow-sm">
-                    Confirmar Reserva
+                <button id="btnConfirmarReservaBloco" onclick="confirmarAgendamentoBloco()" class="flex-1 bg-copa-orange text-white font-bold py-3 rounded-lg text-xs shadow-sm min-h-[44px]">
+                    Confirmar
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 3: CONFIRMAÇÃO DE SUCESSO E GERAR TEAMS / ICS -->
-    <div id="modalSucessoReserva" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-emerald-500 text-center">
-            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                <i data-lucide="check-circle-2" class="w-8 h-8"></i>
+    <!-- MODAL 3: CONFIRMAÇÃO DE SUCESSO -->
+    <div id="modalSucessoReserva" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-emerald-500 text-center text-slate-800 dark:text-slate-100">
+            <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i data-lucide="check-circle-2" class="w-6 h-6"></i>
             </div>
-            <h3 class="text-base font-bold text-copa-teal mb-1">Agendamento Concluído!</h3>
-            <p class="text-xs text-slate-600 mb-4" id="textoSucessoReserva">Sua sala foi reservada com sucesso.</p>
+            <h3 class="text-base font-bold text-copa-teal dark:text-emerald-400 mb-1">Reservado com Sucesso!</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 mb-4" id="textoSucessoReserva"></p>
 
-            <div class="space-y-2 mb-6">
-                <a id="btnTeamsCalendar" target="_blank" class="w-full bg-[#5B5FC7] hover:bg-[#4F52B2] text-white font-bold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition shadow-sm">
+            <div class="space-y-2 mb-4">
+                <a id="btnTeamsCalendar" target="_blank" class="w-full bg-[#5B5FC7] hover:bg-[#4F52B2] text-white font-bold py-3 px-4 rounded-lg text-xs flex items-center justify-center gap-2 min-h-[44px]">
                     <i data-lucide="video" class="w-4 h-4"></i>
-                    Adicionar no Microsoft Teams / Outlook
+                    Adicionar no Teams / Outlook
                 </a>
-                <button onclick="baixarArquivoICS()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 px-4 rounded-lg text-xs flex items-center justify-center gap-2 transition border border-slate-300">
+                <button onclick="baixarArquivoICS()" class="w-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 font-bold py-3 px-4 rounded-lg text-xs flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-600 min-h-[44px]">
                     <i data-lucide="download" class="w-4 h-4"></i>
                     Baixar Lembrete (.ics)
                 </button>
             </div>
 
-            <button onclick="fecharModalSucesso()" class="bg-copa-teal text-white font-bold py-2 px-6 rounded-lg text-xs">
+            <button onclick="fecharModalSucesso()" class="bg-copa-teal dark:bg-slate-700 text-white font-bold py-2.5 px-6 rounded-lg text-xs w-full min-h-[44px]">
                 Fechar
             </button>
         </div>
     </div>
 
-    <!-- MODAL 4: CANCELAMENTO AUDITADO -->
-    <div id="modalCancelarReserva" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border-t-4 border-rose-600">
-            <h3 class="text-base font-bold text-copa-teal mb-2 flex items-center gap-2">
+    <!-- MODAL 4: CANCELAMENTO COM PIN -->
+    <div id="modalCancelarReserva" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-rose-600 text-slate-800 dark:text-slate-100">
+            <h3 class="text-base font-bold text-copa-teal dark:text-amber-400 mb-2 flex items-center gap-2">
                 <i data-lucide="alert-triangle" class="w-5 h-5 text-rose-600"></i>
                 Cancelar Agendamento
             </h3>
-            <p class="text-xs text-slate-600 mb-4" id="textoAvisoCancelamento">
-                Informe o motivo para registro de auditoria na Copa Energia.
-            </p>
 
             <div class="space-y-3 text-xs mb-4">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Motivo do Cancelamento *</label>
-                    <input type="text" id="inputMotivoCancelamento" placeholder="Ex: Reunião reagendada pelo solicitante" class="w-full border border-slate-300 rounded-lg p-2.5 focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Motivo *</label>
+                    <input type="text" id="inputMotivoCancelamento" placeholder="Ex: Reagendado pelo solicitante" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">PIN de Segurança (4 Números) *</label>
+                    <input type="password" id="inputPinCancelamento" maxlength="4" placeholder="Digite seu PIN" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-rose-500 focus:outline-none">
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2">
-                <button onclick="fecharModalCancelar()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2.5 rounded-lg text-xs">
+            <div class="flex gap-2">
+                <button onclick="fecharModalCancelar()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-lg text-xs min-h-[44px]">
                     Voltar
                 </button>
-                <button onclick="confirmarCancelamentoModal()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2.5 rounded-lg text-xs shadow-sm">
-                    Confirmar Cancelamento
+                <button onclick="confirmarCancelamentoModal()" class="flex-1 bg-rose-600 text-white font-bold py-3 rounded-lg text-xs shadow-sm min-h-[44px]">
+                    Confirmar
                 </button>
             </div>
         </div>
     </div>
 
     <!-- MODAL 5: HISTÓRICO DE AUDITORIA -->
-    <div id="modalHistorico" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl border-t-4 border-copa-teal">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-bold text-copa-teal flex items-center gap-2">
+    <div id="modalHistorico" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-2xl w-full p-5 shadow-2xl border-t-4 border-copa-teal text-slate-800 dark:text-slate-100">
+            <div class="flex justify-between items-center mb-3">
+                <h3 class="text-base font-bold text-copa-teal dark:text-amber-400 flex items-center gap-2">
                     <i data-lucide="history" class="w-5 h-5 text-copa-orange"></i>
-                    Histórico de Auditoria & Cancelamentos
+                    Auditoria
                 </h3>
-                <button onclick="fecharHistoricoModal()" class="text-slate-400 hover:text-slate-600">
+                <button onclick="fecharHistoricoModal()" class="p-1 text-slate-400 hover:text-slate-600">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
 
-            <div class="max-h-80 overflow-y-auto border border-slate-200 rounded-lg">
+            <div class="max-h-72 overflow-y-auto border border-slate-200 dark:border-slate-700 rounded-lg">
                 <table class="w-full text-left text-xs">
-                    <thead class="bg-copa-teal text-white sticky top-0">
+                    <thead class="bg-copa-teal dark:bg-slate-900 text-white sticky top-0">
                         <tr>
-                            <th class="p-2.5">Horário/Data</th>
-                            <th class="p-2.5">Reservado Por</th>
-                            <th class="p-2.5">Cancelado Por</th>
-                            <th class="p-2.5">Motivo</th>
-                            <th class="p-2.5">Data da Ação</th>
+                            <th class="p-2">Data/Hora</th>
+                            <th class="p-2">Reservou</th>
+                            <th class="p-2">Cancelou</th>
+                            <th class="p-2">Motivo</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaLogsHistorico">
-                        <!-- Logs JS -->
                     </tbody>
                 </table>
             </div>
 
             <div class="mt-4 flex justify-end">
-                <button onclick="fecharHistoricoModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs px-4 py-2 rounded-lg">
+                <button onclick="fecharHistoricoModal()" class="w-full sm:w-auto bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 font-semibold text-xs px-4 py-3 rounded-lg min-h-[44px]">
                     Fechar
                 </button>
             </div>
@@ -532,8 +521,21 @@
         let usuarioSessao = JSON.parse(localStorage.getItem('copa_usuario_atual')) || null;
         let modoVisao = 'dia';
         let filtroApenasLivres = false;
+        let filtroMinhasReunioes = false;
         let slotParaCancelar = null;
         let dadosUltimaReserva = null;
+
+        function alternarModoEscuro() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('copa_theme', isDark ? 'dark' : 'light');
+            document.getElementById('iconeTheme').setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
+
+        if (localStorage.getItem('copa_theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
 
         function inicializarFirebaseListeners() {
             refReservas.on('value', (snapshot) => {
@@ -563,12 +565,12 @@
             const pin = document.getElementById('inputPinUsuario').value.trim();
 
             if (!nome || !setor || !email || !pin || pin.length < 4) {
-                alert('Por favor, preencha o Nome, Setor, E-mail Corporativo e o PIN de 4 números.');
+                alert('Por favor, preencha o Nome, Setor, E-mail e o PIN de 4 números.');
                 return;
             }
 
             if (!email.endsWith('@copaenergia.com.br')) {
-                alert('Por favor, utilize um e-mail corporativo válido (@copaenergia.com.br).');
+                alert('Por favor, utilize um e-mail corporativo (@copaenergia.com.br).');
                 return;
             }
 
@@ -584,7 +586,7 @@
             if (usuarioSessao) {
                 label.innerText = `${usuarioSessao.nome} (${usuarioSessao.setor || 'Geral'})`;
             } else {
-                label.innerText = 'Não identificado (Clique para entrar)';
+                label.innerText = 'Não identificado (Toque para entrar)';
             }
         }
 
@@ -601,17 +603,45 @@
 
         function toggleFiltroApenasLivres() {
             filtroApenasLivres = !filtroApenasLivres;
-            const btn = document.getElementById('btnFiltroLivres');
-            const label = document.getElementById('labelFiltroLivres');
+            if (filtroApenasLivres) filtroMinhasReunioes = false;
+
+            atualizarBotoesFiltro();
+            renderTabela();
+        }
+
+        function toggleFiltroMinhasReunioes() {
+            if (!usuarioSessao) {
+                solicitarIdentificacao();
+                return;
+            }
+            filtroMinhasReunioes = !filtroMinhasReunioes;
+            if (filtroMinhasReunioes) filtroApenasLivres = false;
+
+            atualizarBotoesFiltro();
+            renderTabela();
+        }
+
+        function atualizarBotoesFiltro() {
+            const btnLivres = document.getElementById('btnFiltroLivres');
+            const labelLivres = document.getElementById('labelFiltroLivres');
+            const btnMinhas = document.getElementById('btnFiltroMinhas');
+            const labelMinhas = document.getElementById('labelFiltroMinhas');
 
             if (filtroApenasLivres) {
-                btn.className = "bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1 whitespace-nowrap shadow-sm";
-                label.innerText = "Mostrando Apenas Livres";
+                btnLivres.className = "bg-emerald-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1 shadow-sm";
+                labelLivres.innerText = "Apenas Livres";
             } else {
-                btn.className = "bg-slate-100 hover:bg-emerald-100 text-slate-700 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 transition text-[11px] flex items-center gap-1 whitespace-nowrap";
-                label.innerText = "Apenas Livres";
+                btnLivres.className = "bg-slate-100 dark:bg-slate-700 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center gap-1";
+                labelLivres.innerText = "Livres";
             }
-            renderTabela();
+
+            if (filtroMinhasReunioes) {
+                btnMinhas.className = "bg-copa-orange text-white font-bold px-2.5 py-1.5 rounded-lg transition text-[11px] flex items-center gap-1 shadow-sm";
+                labelMinhas.innerText = "Minhas Reuniões";
+            } else {
+                btnMinhas.className = "bg-slate-100 dark:bg-slate-700 hover:bg-amber-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center gap-1";
+                labelMinhas.innerText = "Minhas";
+            }
         }
 
         function alternarVisao(modo) {
@@ -622,20 +652,20 @@
             const containerSemana = document.getElementById('containerGradeSemanal');
 
             if (modo === 'dia') {
-                btnDia.className = "bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition";
-                btnSemana.className = "text-slate-600 hover:text-copa-teal font-bold px-3 py-1.5 rounded-md text-[11px] transition";
+                btnDia.className = "flex-1 sm:flex-none bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition text-center";
+                btnSemana.className = "flex-1 sm:flex-none text-slate-600 dark:text-slate-300 hover:text-copa-teal font-bold px-3 py-1.5 rounded-md text-[11px] transition text-center";
                 containerDia.classList.remove('hidden');
                 containerSemana.classList.add('hidden');
             } else {
-                btnSemana.className = "bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition";
-                btnDia.className = "text-slate-600 hover:text-copa-teal font-bold px-3 py-1.5 rounded-md text-[11px] transition";
+                btnSemana.className = "flex-1 sm:flex-none bg-copa-teal text-white font-bold px-3 py-1.5 rounded-md text-[11px] transition text-center";
+                btnDia.className = "flex-1 sm:flex-none text-slate-600 dark:text-slate-300 hover:text-copa-teal font-bold px-3 py-1.5 rounded-md text-[11px] transition text-center";
                 containerSemana.classList.remove('hidden');
                 containerDia.classList.add('hidden');
             }
             renderTabela();
         }
 
-        // AGENDAMENTO EM BLOCO
+        // AGENDAMENTO
         function abrirModalNovaReserva(horarioInicioSugerido) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -646,12 +676,11 @@
             const hojeData = new Date().toISOString().split('T')[0];
 
             if (chaveData < hojeData) {
-                alert('Não é possível realizar agendamentos em datas passadas.');
+                alert('Não é possível agendar em datas passadas.');
                 return;
             }
 
             const reservasHoje = reservas[chaveData] || {};
-
             const selInicio = document.getElementById('selectHoraInicio');
             selInicio.innerHTML = '';
 
@@ -736,17 +765,12 @@
             const hojeData = new Date().toISOString().split('T')[0];
 
             if (chaveData < hojeData) {
-                alert('Não é possível realizar agendamentos em datas passadas.');
+                alert('Não é possível agendar em datas passadas.');
                 return;
             }
 
-            if (!assunto) {
-                alert('Por favor, informe o assunto ou projeto da reunião.');
-                return;
-            }
-
-            if (!hInicio || !hFim) {
-                alert('Por favor, selecione os horários de início e fim.');
+            if (!assunto || !hInicio || !hFim) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
                 return;
             }
 
@@ -759,7 +783,7 @@
             const jaReservados = slotsAfetados.filter(slot => reservasHoje[slot.replace(':', 'h')]);
 
             if (jaReservados.length > 0) {
-                alert(`Não foi possível agendar. Os seguintes horários já estão ocupados: ${jaReservados.join(', ')}`);
+                alert(`Alguns horários já estão ocupados: ${jaReservados.join(', ')}`);
                 return;
             }
 
@@ -789,19 +813,52 @@
             document.getElementById('modalSucessoReserva').classList.remove('hidden');
         }
 
+        function estenderReuniaoRapida(horarioAtualSlot) {
+            const idxAtual = horarios.indexOf(horarioAtualSlot);
+            if (idxAtual === -1 || idxAtual === horarios.length - 1) {
+                alert('Não há mais horários disponíveis para prorrogação hoje.');
+                return;
+            }
+
+            const proximoSlot = horarios[idxAtual + 1];
+            const chaveData = getDataAtualChave();
+            const chaveProximoSlot = proximoSlot.replace(':', 'h');
+            const chaveSlotAtual = horarioAtualSlot.replace(':', 'h');
+
+            if (reservas[chaveData]?.[chaveProximoSlot]) {
+                alert(`O próximo horário (${proximoSlot}) já está reservado por outro colega.`);
+                return;
+            }
+
+            const reservaAtual = reservas[chaveData]?.[chaveSlotAtual];
+            if (!reservaAtual) return;
+
+            refReservas.child(chaveData).child(chaveProximoSlot).set({
+                horarioOriginal: proximoSlot,
+                responsavel: reservaAtual.responsavel,
+                setor: reservaAtual.setor || '-',
+                email: reservaAtual.email,
+                assunto: `${reservaAtual.assunto} (Prorrogado)`,
+                criadoPor: usuarioSessao.nome,
+                criadoEm: new Date().toLocaleString('pt-BR')
+            });
+
+            alert(`Reunião prorrogada com sucesso até ${proximoSlot.split(' - ')[1]}!`);
+        }
+
         function gerarLinksAgendaTeams(dados) {
             const [ano, mes, dia] = dados.data.split('-');
             const dtInicioISO = `${ano}-${mes}-${dia}T${dados.horaInicio}:00`;
             const dtFimISO = `${ano}-${mes}-${dia}T${dados.horaFim}:00`;
 
             const assunto = encodeURIComponent(`Reunião: ${dados.assunto}`);
-            const local = encodeURIComponent(`Sala de Reunião - Copa Energia SJC`);
-            const corpo = encodeURIComponent(`Reunião agendada por: ${dados.solicitante}\nSala de Reunião - Copa Energia`);
+            const local = encodeURIComponent(`Sala Sustentabilidade - Copa Energia SJC`);
+            const corpo = encodeURIComponent(`Reunião agendada por: ${dados.solicitante}\nCopa Energia`);
 
             const urlTeamsWeb = `https://outlook.office.com/calendar/0/deeplink/compose?subject=${assunto}&location=${local}&body=${corpo}&startdt=${dtInicioISO}&enddt=${dtFimISO}`;
             
             document.getElementById('btnTeamsCalendar').href = urlTeamsWeb;
-            document.getElementById('textoSucessoReserva').innerText = `Reunião "${dados.assunto}" agendada das ${dados.horaInicio} às ${dados.horaFim} (${dia}/${mes}/${ano}).`;
+            document.getElementById('textoSucessoReserva').innerText = `"${dados.assunto}" (${dados.horaInicio} às ${dados.horaFim})`;
         }
 
         function baixarArquivoICS() {
@@ -817,7 +874,7 @@
                 "BEGIN:VEVENT",
                 `SUMMARY:Reunião: ${dadosUltimaReserva.assunto}`,
                 `DESCRIPTION:Agendado por ${dadosUltimaReserva.solicitante}`,
-                "LOCATION:Sala de Reunião - Copa Energia SJC",
+                "LOCATION:Sala Sustentabilidade - Copa Energia SJC",
                 `DTSTART:${dtStart}`,
                 `DTEND:${dtEnd}`,
                 "END:VEVENT",
@@ -837,7 +894,7 @@
             document.getElementById('modalSucessoReserva').classList.add('hidden');
         }
 
-        // CANCELAMENTO AUDITADO
+        // CANCELAMENTO AUDITADO COM PIN
         function abrirModalCancelarSlot(horario) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -845,6 +902,7 @@
             }
             slotParaCancelar = horario;
             document.getElementById('inputMotivoCancelamento').value = '';
+            document.getElementById('inputPinCancelamento').value = '';
             document.getElementById('modalCancelarReserva').classList.remove('hidden');
         }
 
@@ -855,8 +913,15 @@
 
         function confirmarCancelamentoModal() {
             const motivo = document.getElementById('inputMotivoCancelamento').value.trim();
+            const pinDigitado = document.getElementById('inputPinCancelamento').value.trim();
+
             if (!motivo) {
-                alert('Por favor, escreva o motivo do cancelamento.');
+                alert('Por favor, informe o motivo.');
+                return;
+            }
+
+            if (!pinDigitado || pinDigitado !== usuarioSessao.pin) {
+                alert('PIN de segurança incorreto.');
                 return;
             }
 
@@ -882,7 +947,7 @@
             }
 
             fecharModalCancelar();
-            alert('Cancelamento registrado no histórico de auditoria.');
+            alert('Cancelamento registrado com sucesso.');
         }
 
         function obterHorarioAtualHHMM() {
@@ -911,26 +976,16 @@
             return agoraHHMM >= inicio && agoraHHMM < fim;
         }
 
-        function atualizarCardProximaReuniao() {
+        function atualizarIndicadorOcupacao() {
             const chaveData = getDataAtualChave();
             const reservasHoje = reservas[chaveData] || {};
-            const agoraHHMM = obterHorarioAtualHHMM();
-            const card = document.getElementById('cardProximaReuniao');
-            const label = document.getElementById('labelProximaReuniao');
+            const totalBlocos = horarios.length;
+            const blocosOcupados = Object.keys(reservasHoje).length;
+            const porcentagem = Math.round((blocosOcupados / totalBlocos) * 100);
 
-            const proximoSlot = horarios.find(h => {
-                const inicio = h.split(' - ')[0];
-                const chaveHorario = h.replace(':', 'h');
-                return inicio > agoraHHMM && reservasHoje[chaveHorario];
-            });
-
-            if (proximoSlot) {
-                const res = reservasHoje[proximoSlot.replace(':', 'h')];
-                label.innerText = `Próxima: ${proximoSlot.split(' - ')[0]} (${res.responsavel})`;
-                card.classList.remove('hidden');
-            } else {
-                card.classList.add('hidden');
-            }
+            document.getElementById('labelOcupacaoPercent').innerText = `${porcentagem}%`;
+            document.getElementById('labelOcupacaoDetalhe').innerText = `(${blocosOcupados}/${totalBlocos})`;
+            document.getElementById('barOcupacao').style.width = `${porcentagem}%`;
         }
 
         function renderTabela() {
@@ -939,7 +994,7 @@
             } else {
                 renderTabelaSemanal();
             }
-            atualizarCardProximaReuniao();
+            atualizarIndicadorOcupacao();
             lucide.createIcons();
         }
 
@@ -958,71 +1013,94 @@
                 const estaAcontecendoAgora = ehHorarioAtual(horario, chaveData);
 
                 if (filtroApenasLivres && reserva) return;
-
-                const tr = document.createElement('tr');
-                tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
-
-                if (estaAcontecendoAgora) {
-                    tr.className += ' bg-amber-50/90 border-l-4 border-l-copa-orange';
+                if (filtroMinhasReunioes) {
+                    if (!reserva) return;
+                    if (usuarioSessao && reserva.email !== usuarioSessao.email) return;
                 }
 
+                const tr = document.createElement('tr');
+                tr.className = `flex flex-col sm:table-row p-3 sm:py-2.5 sm:px-3 h-auto sm:h-12 box-border ${
+                    index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/50'
+                }`;
+
+                if (estaAcontecendoAgora) {
+                    tr.className += ' bg-amber-100/80 dark:bg-amber-950/60 border-l-4 border-l-copa-orange font-semibold';
+                }
+
+                // BADGE "AGORA" ALINHADO NA MESMA LINHA
                 const badgeAgora = estaAcontecendoAgora 
-                    ? `<span class="bg-copa-orange text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider block mt-1 animate-pulse">Agora</span>`
+                    ? `<span class="bg-copa-orange text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse inline-block">Agora</span>`
                     : '';
 
                 if (reserva) {
-                    const botaoAcaoReserva = passado 
-                        ? `<span class="text-slate-400 text-[10px] font-bold uppercase">Concluído</span>`
-                        : `<button onclick="abrirModalCancelarSlot('${horario}')" class="bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
+                    let botoesAcao = '';
+
+                    if (passado) {
+                        botoesAcao = `<span class="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase">Concluído</span>`;
+                    } else {
+                        const btnEstender = estaAcontecendoAgora 
+                            ? `<button onclick="estenderReuniaoRapida('${horario}')" title="Prorrogar por +30 min" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2 py-1 rounded-md text-[10px] flex items-center justify-center gap-0.5 shadow-sm transition">
+                                    <i data-lucide="clock-4" class="w-3 h-3"></i> +30m
+                               </button>` 
+                            : '';
+
+                        botoesAcao = `<div class="flex items-center justify-end sm:justify-center gap-1.5 w-full">
+                            ${btnEstender}
+                            <button onclick="abrirModalCancelarSlot('${horario}')" class="bg-red-100 dark:bg-red-950/60 hover:bg-red-200 text-red-700 dark:text-red-300 font-bold px-2.5 py-1 sm:py-1 rounded-md text-[11px] flex items-center gap-1 transition">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Cancelar
-                           </button>`;
+                            </button>
+                        </div>`;
+                    }
 
                     tr.innerHTML = `
-                        <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-copa-teal bg-orange-50/40">
-                            ${horario}
-                            ${badgeAgora}
-                        </td>
-                        <td class="py-2.5 px-3 border border-slate-200 font-bold text-slate-800">
-                            <div class="flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-copa-orange"></span>
-                                ${reserva.responsavel}
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 font-bold text-copa-teal dark:text-amber-400 flex justify-between sm:table-cell items-center mb-1 sm:mb-0 sm:text-center">
+                            <div class="flex items-center justify-between sm:justify-center gap-1.5 w-full">
+                                <span>${horario}</span>
+                                ${badgeAgora}
                             </div>
                         </td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-600 font-medium">
-                            ${reserva.setor && reserva.setor !== '-' ? reserva.setor : '-'}
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 font-bold text-slate-800 dark:text-slate-100">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-copa-orange flex-shrink-0"></span>
+                                <span class="truncate">${reserva.responsavel}</span>
+                            </div>
                         </td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-600">
-                            ${reserva.assunto}
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-slate-600 dark:text-slate-300 font-medium">
+                            <span class="sm:hidden font-semibold text-slate-400">Setor: </span>${reserva.setor && reserva.setor !== '-' ? reserva.setor : '-'}
                         </td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-center no-print">
-                            ${botaoAcaoReserva}
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-slate-600 dark:text-slate-300 mb-2 sm:mb-0">
+                            <span class="sm:hidden font-semibold text-slate-400">Assunto: </span>${reserva.assunto}
+                        </td>
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-right sm:text-center no-print border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100 dark:border-slate-700">
+                            ${botoesAcao}
                         </td>
                     `;
                 } else if (passado) {
                     tr.innerHTML = `
-                        <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-slate-400 bg-slate-100">
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 font-bold text-slate-400 dark:text-slate-500 text-center">
                             ${horario}
                         </td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">Encerrado</td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-center no-print">
-                            <span class="text-slate-400 text-[10px] font-bold uppercase">Encerrado</span>
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-slate-400 dark:text-slate-500 italic">Encerrado</td>
+                        <td class="hidden sm:table-cell sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-slate-400 dark:text-slate-500 italic">-</td>
+                        <td class="hidden sm:table-cell sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-slate-400 dark:text-slate-500 italic">-</td>
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-right sm:text-center no-print">
+                            <span class="text-slate-400 dark:text-slate-500 text-[10px] font-bold uppercase">Encerrado</span>
                         </td>
                     `;
                 } else {
                     tr.innerHTML = `
-                        <td class="py-2.5 px-3 border border-slate-200 text-center font-bold text-copa-teal">
-                            ${horario}
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 font-bold text-copa-teal dark:text-amber-400 flex justify-between sm:table-cell items-center mb-1 sm:mb-0 sm:text-center">
+                            <span>${horario}</span>
+                            <span class="sm:hidden text-emerald-600 dark:text-emerald-400 font-semibold text-[11px]">Livre</span>
                         </td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">Disponível</td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-slate-400 italic">-</td>
-                        <td class="py-2.5 px-3 border border-slate-200 text-center no-print">
+                        <td class="hidden sm:table-cell sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-slate-400 dark:text-slate-500 italic">Disponível</td>
+                        <td class="hidden sm:table-cell sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-slate-400 dark:text-slate-500 italic">-</td>
+                        <td class="hidden sm:table-cell sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-slate-400 dark:text-slate-500 italic">-</td>
+                        <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-right sm:text-center no-print">
                             ${
                                 ehDataPassada
-                                ? `<span class="text-slate-300 text-[10px] font-bold uppercase">-</span>`
-                                : `<button onclick="abrirModalNovaReserva('${horario}')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold px-2.5 py-1 rounded-md text-[11px] flex items-center justify-center gap-1 mx-auto transition-colors">
+                                ? `<span class="text-slate-300 dark:text-slate-600 text-[10px] font-bold uppercase">-</span>`
+                                : `<button onclick="abrirModalNovaReserva('${horario}')" class="w-full sm:w-auto bg-emerald-100 dark:bg-emerald-950/60 hover:bg-emerald-200 text-emerald-800 dark:text-emerald-300 font-bold px-3 py-2 sm:py-1 rounded-md text-xs sm:text-[11px] flex items-center justify-center gap-1 transition">
                                         <i data-lucide="plus" class="w-3.5 h-3.5"></i> Reservar
                                    </button>`
                             }
@@ -1052,9 +1130,11 @@
 
             horarios.forEach((horario, index) => {
                 const tr = document.createElement('tr');
-                tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50';
+                tr.className = index % 2 === 0 
+                    ? 'bg-white dark:bg-slate-800' 
+                    : 'bg-slate-50 dark:bg-slate-800/50';
 
-                let html = `<td class="p-2 border border-slate-200 text-center font-bold text-copa-teal">${horario}</td>`;
+                let html = `<td class="p-2 border border-slate-200 dark:border-slate-700 text-center font-bold text-copa-teal dark:text-amber-400 text-[10px]">${horario.split(' - ')[0]}</td>`;
 
                 diasSemanaChaves.forEach(chaveData => {
                     const chaveHorario = horario.replace(':', 'h');
@@ -1062,13 +1142,12 @@
 
                     if (reserva) {
                         html += `
-                            <td class="p-2 border border-slate-200 bg-orange-100 text-copa-teal font-bold text-[10px] text-center">
-                                <span class="block text-copa-orange font-black">${reserva.responsavel}</span>
-                                <span class="text-slate-600 truncate block max-w-[90px] mx-auto">${reserva.assunto}</span>
+                            <td class="p-1.5 border border-slate-200 dark:border-slate-700 bg-orange-100 dark:bg-orange-950/40 text-copa-teal dark:text-amber-200 font-bold text-[9px] text-center">
+                                <span class="block text-copa-orange font-black truncate">${reserva.responsavel.split(' ')[0]}</span>
                             </td>
                         `;
                     } else {
-                        html += `<td class="p-2 border border-slate-200 text-center text-slate-300 font-medium text-[10px]">Livre</td>`;
+                        html += `<td class="p-1.5 border border-slate-200 dark:border-slate-700 text-center text-slate-300 dark:text-slate-600 text-[9px]">Livre</td>`;
                     }
                 });
 
@@ -1093,17 +1172,16 @@
             tbody.innerHTML = '';
 
             if (logsCancelamento.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Nenhum registo de alteração/exclusão até ao momento.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Nenhum registo de auditoria até ao momento.</td></tr>`;
             } else {
                 logsCancelamento.forEach(log => {
                     const tr = document.createElement('tr');
-                    tr.className = "border-b text-xs hover:bg-slate-50";
+                    tr.className = "border-b dark:border-slate-700 text-[11px] hover:bg-slate-50 dark:hover:bg-slate-700/50";
                     tr.innerHTML = `
-                        <td class="p-2.5 font-semibold text-slate-700">${log.dataReuniao} (${log.horario})</td>
-                        <td class="p-2.5 text-slate-600">${log.reservadoPor}</td>
-                        <td class="p-2.5 font-bold text-rose-600">${log.canceladoPor} (${log.setorCancelador || log.emailCancelador})</td>
-                        <td class="p-2.5 text-slate-600">${log.motivo}</td>
-                        <td class="p-2.5 text-slate-400">${log.dataAcao}</td>
+                        <td class="p-2 font-semibold text-slate-700 dark:text-slate-300">${log.dataReuniao} (${log.horario.split(' - ')[0]})</td>
+                        <td class="p-2 text-slate-600 dark:text-slate-400">${log.reservadoPor.split(' ')[0]}</td>
+                        <td class="p-2 font-bold text-rose-600 dark:text-rose-400">${log.canceladoPor.split(' ')[0]}</td>
+                        <td class="p-2 text-slate-600 dark:text-slate-400 truncate max-w-[100px]">${log.motivo}</td>
                     `;
                     tbody.appendChild(tr);
                 });
