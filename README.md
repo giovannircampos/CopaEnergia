@@ -42,6 +42,7 @@ Embora tenha sido idealizado para atender inicialmente a uma estrutura de centro
 
 ## 👤 Autor
 
-## 👤 Autor
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/giovanni-rocha-51485031a/)
 
-Desenvolvido por **[Giovanni Rocha](https://www.linkedin.com/in/giovanni-rocha-51485031a)** *Dev Front-end Jr | React | HTML | CSS | JavaScript | UI/UX*
+**Giovanni Rocha**  
+*Dev Front-end Jr | React | HTML | CSS | JavaScript | UI/UX*
