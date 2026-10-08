@@ -39,3 +39,9 @@ Embora tenha sido idealizado para atender inicialmente a uma estrutura de centro
 ```text
 ├── index.html        # Single Page Application (HTML, Tailwind CSS, JS e lógica do Firebase)
 └── README.md         # Documentação do projeto
+
+## 👤 Autor
+
+## 👤 Autor
+
+Desenvolvido por **[Giovanni Rocha](https://www.linkedin.com/in/giovanni-rocha-51485031a)** *Dev Front-end Jr | React | HTML | CSS | JavaScript | UI/UX*
