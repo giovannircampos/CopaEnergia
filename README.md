@@ -1,4 +1,4 @@
-# 📅 Agendamento de Sala de Reunião — Sala Sustentabilidade
+# 📅 Agendamento de Sala de Reunião — Sala Sustentabilidade (Copa Energia)
 
 > Aplicação web responsiva e em tempo real para gestão, consulta e auditoria de agendamentos de salas de reunião corporativas na **Copa Energia**.
 
@@ -6,16 +6,16 @@
 
 ## 💡 Sobre o Projeto
 
-O projeto nasceu com o objetivo de solucionar gargalos comuns na gestão de espaços colaborativos, como sobreposição de horários, reservas "fantasma" e falta de visibilidade da ocupação.
+O projeto nasceu com o objetivo de solucionar gargalos comuns na gestão de espaços colaborativos, como sobreposição de horários, reservas "fantasma" e falta de visibilidade da ocupação da sala.
 
-Embora tenha sido idealizado para atender inicialmente a uma estrutura enxuta de centro operativo, a arquitetura foi desenhada com foco em **escalabilidade**. O sistema está pronto para ser replicado em unidades maiores, filiais com alta demanda ou na Sede corporativa.
+Embora tenha sido idealizado para atender inicialmente a uma estrutura de centro operativo, a arquitetura foi desenhada com foco em **escalabilidade**. O sistema está pronto para ser replicado em unidades maiores, filiais com alta demanda ou na Sede corporativa.
 
 ---
 
 ## 🚀 Principais Funcionalidades
 
 - ⚡ **Sincronização em Tempo Real:** Atualizações instantâneas de disponibilidade utilizando o **Firebase Realtime Database**.
-- 🔔 **Notificações do Sistema:** Alertas nativos no navegador/mobile avisando o colaborador 5 minutos antes do fim da reunião.
+- 🔔 **Notificações do Sistema:** Alertas nativos no navegador/mobile avisando o colaborador 5 minutos antes do fim da reunião (com botão *toggle* de controle).
 - 🛡️ **Prevenção de Conflitos:** Algoritmo de validação que impede agendamentos em duplicado no mesmo intervalo de tempo para o mesmo perfil.
 - 🔐 **Auditoria e Segurança:** Registro detalhado de cancelamentos com exigência de PIN corporativo de 4 dígitos e justificativa.
 - 📆 **Integração com Agendas:** Criação direta de eventos no **Microsoft Teams / Outlook** e download de arquivo de lembrete `.ics`.
@@ -37,7 +37,5 @@ Embora tenha sido idealizado para atender inicialmente a uma estrutura enxuta de
 ## 📂 Estrutura do Repositório
 
 ```text
-├── index.html        # Aplicação Single Page (HTML, Tailwind CSS, JS e lógica do Firebase)
+├── index.html        # Single Page Application (HTML, Tailwind CSS, JS e lógica do Firebase)
 └── README.md         # Documentação do projeto
-
-
