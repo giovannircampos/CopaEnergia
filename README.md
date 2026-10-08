@@ -34,15 +34,16 @@ Embora tenha sido idealizado para atender inicialmente a uma estrutura de centro
 
 ---
 
-## 📂 Estrutura do Repositório
-
-```text
-├── index.html        # Single Page Application (HTML, Tailwind CSS, JS e lógica do Firebase)
-└── README.md         # Documentação do projeto
-
 ## 👤 Autor
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/giovanni-rocha-51485031a/)
 
 **Giovanni Rocha**  
 *Dev Front-end Jr | React | HTML | CSS | JavaScript | UI/UX*
+
+## 📂 Estrutura do Repositório
+
+```text
+├── index.html        # Single Page Application (HTML, Tailwind CSS, JS e lógica do Firebase)
+└── README.md         # Documentação do projeto
+
