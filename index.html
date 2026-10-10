@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Agendamento de Sala de Reunião - Copa Energia</title>
 
-    <!-- Suporte PWA (Instalação como App) -->
-    <link rel="manifest" href="./manifest.json">
-    <meta name="theme-color" content="#FA8432">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Salas Copa">
-
     <!-- Google Fonts: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,15 +98,6 @@
         </div>
 
         <div class="flex items-center gap-2 flex-shrink-0">
-            <!-- BOTÃO TOGGLE DE NOTIFICAÇÕES -->
-            <button onclick="alternarNotificacoes()" id="btnToggleNotificacao" class="flex items-center gap-1.5 bg-slate-700/60 hover:bg-slate-700 text-white px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition shadow-sm border border-slate-600/50">
-                <i data-lucide="bell" id="iconeSino" class="w-3.5 h-3.5 text-slate-400"></i>
-                <span class="hidden sm:inline">Avisos</span>
-                <div id="switchNotificacao" class="w-7 h-4 bg-slate-500 rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center">
-                    <div id="bolinhaSwitch" class="w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out"></div>
-                </div>
-            </button>
-
             <button onclick="alternarModoEscuro()" class="p-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg transition-colors shadow-sm" title="Alternar Modo Escuro/Claro">
                 <i data-lucide="moon" id="iconeTheme" class="w-4 h-4"></i>
             </button>
@@ -135,33 +119,25 @@
                 <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Consulta de histórico e agendamento de reuniões corporativas.</p>
             </div>
 
-            <div class="flex items-center gap-2">
-                <!-- BOTÃO DE INSTALAÇÃO DO PWA NA TELA INICIAL -->
-                <button id="btnInstalarApp" onclick="instalarPWA()" class="hidden flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-2 sm:py-2.5 rounded-lg transition-colors shadow-sm">
-                    <i data-lucide="download-cloud" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Instalar App</span>
+            <div class="hidden sm:flex flex-wrap gap-2">
+                <button onclick="abrirModalNovaReserva()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
+                    <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                    Nova Reserva
                 </button>
-
-                <div class="hidden sm:flex flex-wrap gap-2">
-                    <button onclick="abrirModalNovaReserva()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
-                        <i data-lucide="calendar-plus" class="w-4 h-4"></i>
-                        Nova Reserva
-                    </button>
-                    <button onclick="abrirHistoricoModal()" class="flex items-center gap-2 bg-copa-teal hover:bg-copa-darkTeal dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-semibold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
-                        <i data-lucide="history" class="w-4 h-4 text-copa-orange"></i>
-                        Auditoria
-                    </button>
-                    <button onclick="window.print()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm border border-slate-300 dark:border-slate-600">
-                        <i data-lucide="printer" class="w-4 h-4"></i>
-                        PDF
-                    </button>
-                </div>
+                <button onclick="abrirHistoricoModal()" class="flex items-center gap-2 bg-copa-teal hover:bg-copa-darkTeal dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-semibold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
+                    <i data-lucide="history" class="w-4 h-4 text-copa-orange"></i>
+                    Auditoria
+                </button>
+                <button onclick="window.print()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm border border-slate-300 dark:border-slate-600">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    PDF
+                </button>
             </div>
         </div>
 
         <hr class="border-slate-200 dark:border-slate-700">
 
-        <!-- Seleção de Visão, Data e Filtros Organizados -->
+        <!-- Seleção de Visão, Data e Filtros -->
         <div class="flex flex-col gap-3 text-xs">
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
                 <div class="bg-slate-100 dark:bg-slate-700 p-1 rounded-lg border border-slate-200 dark:border-slate-600 flex items-center gap-1 w-full sm:w-auto">
@@ -316,16 +292,9 @@
                 </div>
             </div>
 
-            <!-- Rodapé Institucional com Status de Conexão Firebase em Tempo Real -->
+            <!-- Rodapé Institucional -->
             <div class="mt-6 pt-3 border-t border-slate-200 dark:border-slate-700 text-center text-[10px] font-semibold text-copa-teal dark:text-slate-400 flex justify-between items-center">
                 <span>Copa Energia — Uso Interno</span>
-                
-                <!-- Sinalizador de Conexão Firebase -->
-                <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-700/80 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-600">
-                    <span id="dotConexao" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span id="textConexao" class="text-emerald-600 dark:text-emerald-400 text-[9px] font-bold">Online</span>
-                </div>
-
                 <span class="text-slate-400 dark:text-slate-500 font-normal">Auditado</span>
             </div>
         </div>
@@ -423,17 +392,6 @@
                         <select id="selectHoraFim" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none font-semibold text-copa-teal dark:text-amber-400">
                         </select>
                     </div>
-                </div>
-
-                <!-- Recorrência Semanal -->
-                <div>
-                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Recorrência</label>
-                    <select id="selectRecorrencia" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none font-medium">
-                        <option value="1">Apenas nesta data</option>
-                        <option value="2">Repetir por 2 semanas</option>
-                        <option value="3">Repetir por 3 semanas</option>
-                        <option value="4">Repetir por 4 semanas (1 mês)</option>
-                    </select>
                 </div>
 
                 <div id="avisoSemHorarios" class="hidden bg-rose-50 text-rose-700 p-2.5 rounded-lg border border-rose-200 text-[11px] font-bold">
@@ -564,178 +522,6 @@
         let filtroMinhasReunioes = false;
         let slotParaCancelar = null;
         let dadosUltimaReserva = null;
-        let notificacaoEnviadaHoje = {};
-        let notificacoesAtivas = localStorage.getItem('copa_notificacoes_ativas') === 'true';
-
-        // --- LÓGICA DE INSTALAÇÃO DO PWA ---
-        let eventoInstalacaoPWA = null;
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            eventoInstalacaoPWA = e;
-            
-            const btn = document.getElementById('btnInstalarApp');
-            if (btn) btn.classList.remove('hidden');
-        });
-
-        async function instalarPWA() {
-            if (eventoInstalacaoPWA) {
-                eventoInstalacaoPWA.prompt();
-                const { outcome } = await eventoInstalacaoPWA.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('Utilizador aceitou a instalação.');
-                }
-                eventoInstalacaoPWA = null;
-                const btn = document.getElementById('btnInstalarApp');
-                if (btn) btn.classList.add('hidden');
-            } else {
-                const ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                if (ehIOS) {
-                    alert('Para instalar no iPhone:\n\n1. Clica no botão Partilhar (ícone do quadrado com seta no Safari).\n2. Seleciona "Adicionar ao ecrã principal".');
-                } else {
-                    alert('A aplicação já está instalada ou o teu navegador não suporta a instalação direta por botão.');
-                }
-            }
-        }
-
-        window.addEventListener('appinstalled', () => {
-            const btn = document.getElementById('btnInstalarApp');
-            if (btn) btn.classList.add('hidden');
-        });
-
-        // MONITOR DE CONEXÃO FIREBASE EM TEMPO REAL
-        function monitorarConexaoFirebase() {
-            db.ref('.info/connected').on('value', (snap) => {
-                const dot = document.getElementById('dotConexao');
-                const text = document.getElementById('textConexao');
-                if (snap.val() === true) {
-                    dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-                    text.innerText = "Online";
-                    text.className = "text-emerald-600 dark:text-emerald-400 text-[9px] font-bold";
-                } else {
-                    dot.className = "w-2 h-2 rounded-full bg-rose-500 animate-ping";
-                    text.innerText = "Offline";
-                    text.className = "text-rose-500 text-[9px] font-bold";
-                }
-            });
-        }
-
-        // CONFIRMAÇÃO DE PRESENÇA (CHECK-IN) E AUTO-LIBERTAÇÃO DE SALA
-        function realizarCheckIn(horarioSlot) {
-            const chaveData = getDataAtualChave();
-            const chaveHorario = horarioSlot.replace(':', 'h');
-            refReservas.child(chaveData).child(chaveHorario).update({ checkedIn: true });
-            alert("Check-in realizado com sucesso! A sala está confirmada.");
-        }
-
-        function verificarAutoCancelamentoSemCheckIn() {
-            const chaveData = getDataAtualChave();
-            const hojeData = new Date().toISOString().split('T')[0];
-            if (chaveData !== hojeData) return;
-
-            const agora = new Date();
-            const reservasHoje = reservas[chaveData] || {};
-
-            Object.keys(reservasHoje).forEach(chaveHorario => {
-                const res = reservasHoje[chaveHorario];
-                if (!res.checkedIn) {
-                    const [hInicio, mInicio] = res.horarioOriginal.split(' - ')[0].split(':').map(Number);
-                    const dataInicio = new Date();
-                    dataInicio.setHours(hInicio, mInicio, 0, 0);
-
-                    const diffMinutos = Math.floor((agora - dataInicio) / 60000);
-
-                    if (diffMinutos >= 10 && diffMinutos < 30) {
-                        refLogs.push({
-                            dataReuniao: chaveData,
-                            horario: res.horarioOriginal,
-                            reservadoPor: res.responsavel,
-                            emailReservado: res.email || '-',
-                            canceladoPor: "SISTEMA AUTOMÁTICO",
-                            emailCancelador: "sistema@copaenergia.com.br",
-                            setorCancelador: "Sistema",
-                            motivo: "Cancelado por falta de Check-in (Mais de 10 min de atraso)",
-                            dataAcao: new Date().toLocaleString('pt-BR'),
-                            timestamp: new Date().toISOString()
-                        });
-
-                        refReservas.child(chaveData).child(chaveHorario).remove();
-                    }
-                }
-            });
-        }
-
-        function alternarNotificacoes() {
-            if (!notificacoesAtivas) {
-                if (!("Notification" in window)) {
-                    alert("Este navegador não suporta notificações de sistema.");
-                    return;
-                }
-
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        notificacoesAtivas = true;
-                        localStorage.setItem('copa_notificacoes_ativas', 'true');
-                        atualizarVisualToggleNotificacao();
-                    } else {
-                        alert("Permissão de notificação negada no navegador.");
-                    }
-                });
-            } else {
-                notificacoesAtivas = false;
-                localStorage.setItem('copa_notificacoes_ativas', 'false');
-                atualizarVisualToggleNotificacao();
-            }
-        }
-
-        function atualizarVisualToggleNotificacao() {
-            const sw = document.getElementById('switchNotificacao');
-            const bolinha = document.getElementById('bolinhaSwitch');
-            const icone = document.getElementById('iconeSino');
-
-            if (notificacoesAtivas) {
-                sw.className = "w-7 h-4 bg-copa-orange rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center";
-                bolinha.className = "w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out transform translate-x-3";
-                icone.className = "w-3.5 h-3.5 text-amber-300";
-            } else {
-                sw.className = "w-7 h-4 bg-slate-500 rounded-full p-0.5 transition-colors duration-200 ease-in-out flex items-center";
-                bolinha.className = "w-3 h-3 bg-white rounded-full transition-transform duration-200 ease-in-out transform translate-x-0";
-                icone.className = "w-3.5 h-3.5 text-slate-400";
-            }
-            lucide.createIcons();
-        }
-
-        function verificarNotificacaoTermino(horarioSlot, reserva) {
-            if (!notificacoesAtivas) return;
-            if (Notification.permission !== "granted") return;
-            if (!usuarioSessao || reserva.email !== usuarioSessao.email) return;
-
-            const agora = new Date();
-            const [hFim, mFim] = horarioSlot.split(' - ')[1].split(':').map(Number);
-            const dataFim = new Date();
-            dataFim.setHours(hFim, mFim, 0, 0);
-
-            const diffMinutos = Math.floor((dataFim - agora) / 60000);
-            const chaveNotif = `${getDataAtualChave()}_${horarioSlot}`;
-
-            if (diffMinutos <= 5 && diffMinutos > 0 && !notificacaoEnviadaHoje[chaveNotif]) {
-                notificacaoEnviadaHoje[chaveNotif] = true;
-                new Notification("Sua Reunião está prestes a terminar! ⏳", {
-                    body: `A reunião "${reserva.assunto}" na Sala Sustentabilidade termina em ${diffMinutos} minutos.`,
-                    icon: "https://unpkg.com/lucide-static@latest/icons/clock.svg"
-                });
-            }
-        }
-
-        function calcularMinutosRestantes(horarioSlot) {
-            const agora = new Date();
-            const [hFim, mFim] = horarioSlot.split(' - ')[1].split(':').map(Number);
-            const dataFim = new Date();
-            dataFim.setHours(hFim, mFim, 0, 0);
-
-            const diffMinutos = Math.ceil((dataFim - agora) / 60000);
-            return diffMinutos > 0 ? diffMinutos : 0;
-        }
 
         function alternarModoEscuro() {
             document.documentElement.classList.toggle('dark');
@@ -753,15 +539,12 @@
             refReservas.on('value', (snapshot) => {
                 reservas = snapshot.val() || {};
                 renderTabela();
-                verificarAutoCancelamentoSemCheckIn();
             });
 
             refLogs.on('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 logsCancelamento = Object.values(data).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             });
-            
-            monitorarConexaoFirebase();
         }
 
         function solicitarIdentificacao() {
@@ -882,7 +665,6 @@
             renderTabela();
         }
 
-        // AGENDAMENTO COM SUPORTE A RECORRÊNCIA
         function abrirModalNovaReserva(horarioInicioSugerido) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -978,11 +760,10 @@
             const assunto = document.getElementById('inputAssuntoReserva').value.trim();
             const hInicio = document.getElementById('selectHoraInicio').value;
             const hFim = document.getElementById('selectHoraFim').value;
-            const semanasRecorrencia = parseInt(document.getElementById('selectRecorrencia').value) || 1;
-            const chaveDataOriginal = getDataAtualChave();
+            const chaveData = getDataAtualChave();
             const hojeData = new Date().toISOString().split('T')[0];
 
-            if (chaveDataOriginal < hojeData) {
+            if (chaveData < hojeData) {
                 alert('Não é possível agendar em datas passadas.');
                 return;
             }
@@ -997,30 +778,22 @@
                 return inSlot >= hInicio && fimSlot <= hFim;
             });
 
-            // Processa semanas de recorrencia
-            for (let sem = 0; sem < semanasRecorrencia; sem++) {
-                const d = new Date(chaveDataOriginal + 'T00:00:00');
-                d.setDate(d.getDate() + (sem * 7));
-                const chaveDataAtual = d.toISOString().split('T')[0];
-
-                slotsAfetados.forEach(slot => {
-                    refReservas.child(chaveDataAtual).child(slot.replace(':', 'h')).set({
-                        horarioOriginal: slot,
-                        responsavel: usuarioSessao.nome,
-                        setor: usuarioSessao.setor || '-',
-                        email: usuarioSessao.email,
-                        assunto: assunto,
-                        criadoPor: usuarioSessao.nome,
-                        criadoEm: new Date().toLocaleString('pt-BR'),
-                        checkedIn: false
-                    });
+            slotsAfetados.forEach(slot => {
+                refReservas.child(chaveData).child(slot.replace(':', 'h')).set({
+                    horarioOriginal: slot,
+                    responsavel: usuarioSessao.nome,
+                    setor: usuarioSessao.setor || '-',
+                    email: usuarioSessao.email,
+                    assunto: assunto,
+                    criadoPor: usuarioSessao.nome,
+                    criadoEm: new Date().toLocaleString('pt-BR')
                 });
-            }
+            });
 
             fecharModalNovaReserva();
 
             dadosUltimaReserva = {
-                data: chaveDataOriginal,
+                data: chaveData,
                 horaInicio: hInicio,
                 horaFim: hFim,
                 assunto: assunto,
@@ -1058,8 +831,7 @@
                 email: reservaAtual.email,
                 assunto: `${reservaAtual.assunto} (Prorrogado)`,
                 criadoPor: usuarioSessao.nome,
-                criadoEm: new Date().toLocaleString('pt-BR'),
-                checkedIn: true
+                criadoEm: new Date().toLocaleString('pt-BR')
             });
 
             alert(`Reunião prorrogada com sucesso até ${proximoSlot.split(' - ')[1]}!`);
@@ -1243,15 +1015,11 @@
 
                 if (estaAcontecendoAgora) {
                     tr.className += ' bg-amber-100/80 dark:bg-amber-950/60 border-l-4 border-l-copa-orange font-semibold';
-                    if (reserva) {
-                        verificarNotificacaoTermino(horario, reserva);
-                    }
                 }
 
                 let badgeAgora = '';
                 if (estaAcontecendoAgora) {
-                    const minRestantes = calcularMinutosRestantes(horario);
-                    badgeAgora = `<span class="bg-copa-orange text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse inline-block">Agora (${minRestantes}m restantes)</span>`;
+                    badgeAgora = `<span class="bg-copa-orange text-white text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider animate-pulse inline-block">Agora</span>`;
                 }
 
                 if (reserva) {
@@ -1266,14 +1034,7 @@
                                </button>` 
                             : '';
 
-                        const btnCheckIn = (estaAcontecendoAgora && !reserva.checkedIn && usuarioSessao && reserva.email === usuarioSessao.email)
-                            ? `<button onclick="realizarCheckIn('${horario}')" title="Confirmar Presença" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 rounded-md text-[10px] flex items-center gap-1 shadow-sm transition animate-bounce">
-                                    <i data-lucide="check-circle-2" class="w-3 h-3"></i> Check-in
-                               </button>`
-                            : (reserva.checkedIn ? `<span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-extrabold flex items-center gap-0.5"><i data-lucide="check" class="w-3 h-3"></i> Presente</span>` : '');
-
                         botoesAcao = `<div class="flex items-center justify-end sm:justify-center gap-1.5 w-full">
-                            ${btnCheckIn}
                             ${btnEstender}
                             <button onclick="abrirModalCancelarSlot('${horario}')" class="bg-red-100 dark:bg-red-950/60 hover:bg-red-200 text-red-700 dark:text-red-300 font-bold px-2.5 py-1 sm:py-1 rounded-md text-[11px] flex items-center gap-1 transition">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Cancelar
@@ -1341,7 +1102,6 @@
             });
         }
 
-        // VISÃO SEMANAL MELHORADA
         function renderTabelaSemanal() {
             const tbody = document.getElementById('tabelaSemanal');
             const containerGradeSemanal = document.getElementById('containerGradeSemanal');
@@ -1407,18 +1167,16 @@
                     const opacidadeFiltro = (filtroMinhasReunioes && !ehMinhaReserva) ? 'opacity-25' : 'opacity-100';
 
                     if (reserva) {
-                        const textoTooltip = `Reunião: ${reserva.assunto}\nOrganizador: ${reserva.responsavel}\nSetor: ${reserva.setor || '-'}\nE-mail: ${reserva.email || '-'}`;
-
                         if (ehMinhaReserva) {
                             html += `
-                                <td class="p-1 border border-slate-200 dark:border-slate-700 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-bold text-[9px] text-center ${opacidadeFiltro}" title="${textoTooltip}">
+                                <td class="p-1 border border-slate-200 dark:border-slate-700 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-bold text-[9px] text-center ${opacidadeFiltro}">
                                     <span class="block text-emerald-700 dark:text-emerald-400 font-black truncate">${reserva.responsavel.split(' ')[0]}</span>
                                     <span class="text-[8px] bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 px-1 rounded">Você</span>
                                 </td>
                             `;
                         } else {
                             html += `
-                                <td class="p-1.5 border border-slate-200 dark:border-slate-700 bg-orange-100 dark:bg-orange-950/40 text-copa-teal dark:text-amber-200 font-bold text-[9px] text-center ${opacidadeFiltro}" title="${textoTooltip}">
+                                <td class="p-1.5 border border-slate-200 dark:border-slate-700 bg-orange-100 dark:bg-orange-950/40 text-copa-teal dark:text-amber-200 font-bold text-[9px] text-center ${opacidadeFiltro}">
                                     <span class="block text-copa-orange font-black truncate">${reserva.responsavel.split(' ')[0]}</span>
                                 </td>
                             `;
@@ -1426,11 +1184,8 @@
                     } else {
                         html += `
                             <td class="p-1 border border-slate-200 dark:border-slate-700 text-center">
-                                <button onclick="agendarRapidoSemanal('${dia.chaveData}', '${horario}')" 
-                                        title="Reservar para ${dia.nome} às ${horaInicio}"
-                                        class="w-full h-full py-1 text-slate-400 dark:text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 hover:font-bold rounded transition-all duration-150 text-[9px] group">
-                                    <span class="group-hover:hidden">Livre</span>
-                                    <span class="hidden group-hover:inline">+ ${horaInicio}</span>
+                                <button onclick="agendarRapidoSemanal('${dia.chaveData}', '${horario}')" class="w-full h-full py-1 text-slate-400 dark:text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 rounded transition text-[9px]">
+                                    Livre
                                 </button>
                             </td>
                         `;
@@ -1494,23 +1249,14 @@
 
             atualizarData();
             atualizarHeaderUsuario();
-            atualizarVisualToggleNotificacao();
             inicializarFirebaseListeners();
 
             if (!usuarioSessao) {
                 solicitarIdentificacao();
             }
 
-            // Regista o Service Worker para suporte PWA
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js').catch(err => {
-                    console.log('Erro ao registrar Service Worker PWA:', err);
-                });
-            }
-
             setInterval(() => {
                 if (modoVisao === 'dia') renderTabelaDiaria();
-                verificarAutoCancelamentoSemCheckIn();
             }, 60000);
         });
     </script>
