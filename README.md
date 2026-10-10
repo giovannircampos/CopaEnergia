@@ -1,6 +1,6 @@
-# 🏢 Agendamento de Sala de Reunião — Copa Energia (SJC)
+# 🏢 Agendamento de Sala de Reunião — Copa Energia
 
-> Aplicação web leve, responsiva e em tempo real para gestão e agendamento da **Sala Sustentabilidade** na unidade da Copa Energia em São José dos Campos.
+> Aplicação web leve, responsiva e em tempo real para gestão e agendamento da **Sala Sustentabilidade** na unidade da Copa Energia.
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/giovanni-rocha-51485031a/)
 [![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)](https://developer.mozilla.org/pt-BR/docs/Web/HTML)
