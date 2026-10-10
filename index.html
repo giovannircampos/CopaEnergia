@@ -4,10 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Agendamento de Sala de Reunião - Copa Energia</title>
+
+    <!-- Suporte PWA (Instalação como App) -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#FA8432">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Salas Copa">
+
     <!-- Google Fonts: Montserrat -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,6 +36,20 @@
                             borderOrange: '#FCD8C1',
                             grayBg: '#F4F6F5'
                         }
+                    },
+                    keyframes: {
+                        highlightGreen: {
+                            '0%': { backgroundColor: '#d1fae5' },
+                            '100%': { backgroundColor: 'transparent' }
+                        },
+                        highlightRed: {
+                            '0%': { backgroundColor: '#fee2e2' },
+                            '100%': { backgroundColor: 'transparent' }
+                        }
+                    },
+                    animation: {
+                        highlightGreen: 'highlightGreen 2s ease-out',
+                        highlightRed: 'highlightRed 2s ease-out'
                     }
                 }
             }
@@ -125,6 +148,7 @@
                 </h2>
                 <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Consulta de histórico e agendamento de reuniões corporativas.</p>
             </div>
+
             <div class="hidden sm:flex flex-wrap gap-2">
                 <button onclick="abrirModalNovaReserva()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
                     <i data-lucide="calendar-plus" class="w-4 h-4"></i>
@@ -298,9 +322,16 @@
                 </div>
             </div>
 
-            <!-- Rodapé Institucional -->
+            <!-- Rodapé Institucional com Status de Conexão Firebase em Tempo Real -->
             <div class="mt-6 pt-3 border-t border-slate-200 dark:border-slate-700 text-center text-[10px] font-semibold text-copa-teal dark:text-slate-400 flex justify-between items-center">
                 <span>Copa Energia — Uso Interno</span>
+                
+                <!-- Sinalizador de Conexão Firebase -->
+                <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-700/80 px-2.5 py-1 rounded-full border border-slate-200 dark:border-slate-600">
+                    <span id="dotConexao" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="textConexao" class="text-emerald-600 dark:text-emerald-400 text-[9px] font-bold">Online</span>
+                </div>
+
                 <span class="text-slate-400 dark:text-slate-500 font-normal">Auditado</span>
             </div>
         </div>
@@ -368,6 +399,7 @@
         </div>
     </div>
 
+    <!-- MODAL DE NOVA RESERVA -->
     <div id="modalNovaReserva" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
         <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-md w-full p-5 shadow-2xl border-t-4 border-copa-orange text-slate-800 dark:text-slate-100">
             <div class="flex justify-between items-center mb-3">
@@ -397,6 +429,17 @@
                         <select id="selectHoraFim" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none font-semibold text-copa-teal dark:text-amber-400">
                         </select>
                     </div>
+                </div>
+
+                <!-- Recorrência Semanal -->
+                <div>
+                    <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Recorrência</label>
+                    <select id="selectRecorrencia" class="w-full border border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg p-2.5 min-h-[44px] focus:ring-2 focus:ring-copa-orange focus:outline-none font-medium">
+                        <option value="1">Apenas nesta data</option>
+                        <option value="2">Repetir por 2 semanas</option>
+                        <option value="3">Repetir por 3 semanas</option>
+                        <option value="4">Repetir por 4 semanas (1 mês)</option>
+                    </select>
                 </div>
 
                 <div id="avisoSemHorarios" class="hidden bg-rose-50 text-rose-700 p-2.5 rounded-lg border border-rose-200 text-[11px] font-bold">
@@ -530,6 +573,68 @@
         let notificacaoEnviadaHoje = {};
         let notificacoesAtivas = localStorage.getItem('copa_notificacoes_ativas') === 'true';
 
+        // MONITOR DE CONEXÃO FIREBASE EM TEMPO REAL
+        function monitorarConexaoFirebase() {
+            db.ref('.info/connected').on('value', (snap) => {
+                const dot = document.getElementById('dotConexao');
+                const text = document.getElementById('textConexao');
+                if (snap.val() === true) {
+                    dot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                    text.innerText = "Online";
+                    text.className = "text-emerald-600 dark:text-emerald-400 text-[9px] font-bold";
+                } else {
+                    dot.className = "w-2 h-2 rounded-full bg-rose-500 animate-ping";
+                    text.innerText = "Offline";
+                    text.className = "text-rose-500 text-[9px] font-bold";
+                }
+            });
+        }
+
+        // CONFIRMAÇÃO DE PRESENÇA (CHECK-IN) E AUTO-LIBERTAÇÃO DE SALA
+        function realizarCheckIn(horarioSlot) {
+            const chaveData = getDataAtualChave();
+            const chaveHorario = horarioSlot.replace(':', 'h');
+            refReservas.child(chaveData).child(chaveHorario).update({ checkedIn: true });
+            alert("Check-in realizado com sucesso! A sala está confirmada.");
+        }
+
+        function verificarAutoCancelamentoSemCheckIn() {
+            const chaveData = getDataAtualChave();
+            const hojeData = new Date().toISOString().split('T')[0];
+            if (chaveData !== hojeData) return;
+
+            const agora = new Date();
+            const reservasHoje = reservas[chaveData] || {};
+
+            Object.keys(reservasHoje).forEach(chaveHorario => {
+                const res = reservasHoje[chaveHorario];
+                if (!res.checkedIn) {
+                    const [hInicio, mInicio] = res.horarioOriginal.split(' - ')[0].split(':').map(Number);
+                    const dataInicio = new Date();
+                    dataInicio.setHours(hInicio, mInicio, 0, 0);
+
+                    const diffMinutos = Math.floor((agora - dataInicio) / 60000);
+
+                    if (diffMinutos >= 10 && diffMinutos < 30) {
+                        refLogs.push({
+                            dataReuniao: chaveData,
+                            horario: res.horarioOriginal,
+                            reservadoPor: res.responsavel,
+                            emailReservado: res.email || '-',
+                            canceladoPor: "SISTEMA AUTOMÁTICO",
+                            emailCancelador: "sistema@copaenergia.com.br",
+                            setorCancelador: "Sistema",
+                            motivo: "Cancelado por falta de Check-in (Mais de 10 min de atraso)",
+                            dataAcao: new Date().toLocaleString('pt-BR'),
+                            timestamp: new Date().toISOString()
+                        });
+
+                        refReservas.child(chaveData).child(chaveHorario).remove();
+                    }
+                }
+            });
+        }
+
         function alternarNotificacoes() {
             if (!notificacoesAtivas) {
                 if (!("Notification" in window)) {
@@ -618,12 +723,15 @@
             refReservas.on('value', (snapshot) => {
                 reservas = snapshot.val() || {};
                 renderTabela();
+                verificarAutoCancelamentoSemCheckIn();
             });
 
             refLogs.on('value', (snapshot) => {
                 const data = snapshot.val() || {};
                 logsCancelamento = Object.values(data).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             });
+            
+            monitorarConexaoFirebase();
         }
 
         function solicitarIdentificacao() {
@@ -698,7 +806,6 @@
             renderTabela();
         }
 
-        // CORREÇÃO DOS ÍCONES DOS BOTÕES DE FILTRO
         function atualizarBotoesFiltro() {
             const btnLivres = document.getElementById('btnFiltroLivres');
             const btnMinhas = document.getElementById('btnFiltroMinhas');
@@ -745,7 +852,7 @@
             renderTabela();
         }
 
-        // AGENDAMENTO
+        // AGENDAMENTO COM SUPORTE A RECORRÊNCIA
         function abrirModalNovaReserva(horarioInicioSugerido) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -841,10 +948,11 @@
             const assunto = document.getElementById('inputAssuntoReserva').value.trim();
             const hInicio = document.getElementById('selectHoraInicio').value;
             const hFim = document.getElementById('selectHoraFim').value;
-            const chaveData = getDataAtualChave();
+            const semanasRecorrencia = parseInt(document.getElementById('selectRecorrencia').value) || 1;
+            const chaveDataOriginal = getDataAtualChave();
             const hojeData = new Date().toISOString().split('T')[0];
 
-            if (chaveData < hojeData) {
+            if (chaveDataOriginal < hojeData) {
                 alert('Não é possível agendar em datas passadas.');
                 return;
             }
@@ -859,48 +967,30 @@
                 return inSlot >= hInicio && fimSlot <= hFim;
             });
 
-            const reservasHoje = reservas[chaveData] || {};
+            // Processa semanas de recorrencia
+            for (let sem = 0; sem < semanasRecorrencia; sem++) {
+                const d = new Date(chaveDataOriginal + 'T00:00:00');
+                d.setDate(d.getDate() + (sem * 7));
+                const chaveDataAtual = d.toISOString().split('T')[0];
 
-            // VALIDAR CONFLITO DE HORÁRIO DO PRÓPRIO UTILIZADOR
-            const jaTemReservaUsuario = Object.values(reservasHoje).some(res => {
-                if (res.email === usuarioSessao.email) {
-                    const [inExistente, fimExistente] = res.horarioOriginal.split(' - ');
-                    return slotsAfetados.some(slot => {
-                        const [inNovo, fimNovo] = slot.split(' - ');
-                        return (inNovo >= inExistente && inNovo < fimExistente);
+                slotsAfetados.forEach(slot => {
+                    refReservas.child(chaveDataAtual).child(slot.replace(':', 'h')).set({
+                        horarioOriginal: slot,
+                        responsavel: usuarioSessao.nome,
+                        setor: usuarioSessao.setor || '-',
+                        email: usuarioSessao.email,
+                        assunto: assunto,
+                        criadoPor: usuarioSessao.nome,
+                        criadoEm: new Date().toLocaleString('pt-BR'),
+                        checkedIn: false
                     });
-                }
-                return false;
-            });
-
-            if (jaTemReservaUsuario) {
-                alert('Aviso: Você já possui uma reunião agendada neste mesmo intervalo de tempo.');
-                return;
-            }
-
-            const jaReservados = slotsAfetados.filter(slot => reservasHoje[slot.replace(':', 'h')]);
-
-            if (jaReservados.length > 0) {
-                alert(`Alguns horários já estão ocupados: ${jaReservados.join(', ')}`);
-                return;
-            }
-
-            slotsAfetados.forEach(slot => {
-                refReservas.child(chaveData).child(slot.replace(':', 'h')).set({
-                    horarioOriginal: slot,
-                    responsavel: usuarioSessao.nome,
-                    setor: usuarioSessao.setor || '-',
-                    email: usuarioSessao.email,
-                    assunto: assunto,
-                    criadoPor: usuarioSessao.nome,
-                    criadoEm: new Date().toLocaleString('pt-BR')
                 });
-            });
+            }
 
             fecharModalNovaReserva();
 
             dadosUltimaReserva = {
-                data: chaveData,
+                data: chaveDataOriginal,
                 horaInicio: hInicio,
                 horaFim: hFim,
                 assunto: assunto,
@@ -938,7 +1028,8 @@
                 email: reservaAtual.email,
                 assunto: `${reservaAtual.assunto} (Prorrogado)`,
                 criadoPor: usuarioSessao.nome,
-                criadoEm: new Date().toLocaleString('pt-BR')
+                criadoEm: new Date().toLocaleString('pt-BR'),
+                checkedIn: true
             });
 
             alert(`Reunião prorrogada com sucesso até ${proximoSlot.split(' - ')[1]}!`);
@@ -1116,7 +1207,7 @@
                 }
 
                 const tr = document.createElement('tr');
-                tr.className = `flex flex-col sm:table-row p-3 sm:py-2.5 sm:px-3 h-auto sm:h-12 box-border ${
+                tr.className = `flex flex-col sm:table-row p-3 sm:py-2.5 sm:px-3 h-auto sm:h-12 box-border transition-colors duration-300 ${
                     index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/50'
                 }`;
 
@@ -1145,7 +1236,14 @@
                                </button>` 
                             : '';
 
+                        const btnCheckIn = (estaAcontecendoAgora && !reserva.checkedIn && usuarioSessao && reserva.email === usuarioSessao.email)
+                            ? `<button onclick="realizarCheckIn('${horario}')" title="Confirmar Presença" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 rounded-md text-[10px] flex items-center gap-1 shadow-sm transition animate-bounce">
+                                    <i data-lucide="check-circle-2" class="w-3 h-3"></i> Check-in
+                               </button>`
+                            : (reserva.checkedIn ? `<span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-extrabold flex items-center gap-0.5"><i data-lucide="check" class="w-3 h-3"></i> Presente</span>` : '');
+
                         botoesAcao = `<div class="flex items-center justify-end sm:justify-center gap-1.5 w-full">
+                            ${btnCheckIn}
                             ${btnEstender}
                             <button onclick="abrirModalCancelarSlot('${horario}')" class="bg-red-100 dark:bg-red-950/60 hover:bg-red-200 text-red-700 dark:text-red-300 font-bold px-2.5 py-1 sm:py-1 rounded-md text-[11px] flex items-center gap-1 transition">
                                 <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Cancelar
@@ -1163,7 +1261,7 @@
                         <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 font-bold text-slate-800 dark:text-slate-100">
                             <div class="flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-copa-orange flex-shrink-0"></span>
-                                <span class="truncate">${reserva.responsavel}</span>
+                                <span class="truncate" title="Assunto: ${reserva.assunto}">${reserva.responsavel}</span>
                             </div>
                         </td>
                         <td class="sm:py-2.5 sm:px-3 sm:border sm:border-slate-200 dark:sm:border-slate-700 text-slate-600 dark:text-slate-300 font-medium">
@@ -1213,7 +1311,7 @@
             });
         }
 
-        // VISÃO SEMANAL MELHORADA (Destaque do Dia Atual, Agendamento Rápido por Clique e Cores)
+        // VISÃO SEMANAL MELHORADA
         function renderTabelaSemanal() {
             const tbody = document.getElementById('tabelaSemanal');
             const containerGradeSemanal = document.getElementById('containerGradeSemanal');
@@ -1241,7 +1339,6 @@
                 });
             }
 
-            // 1. Atualizar Cabeçalho com Destaque para o Dia Atual ("Hoje")
             if (thead) {
                 let htmlHeader = `<tr class="bg-copa-teal dark:bg-slate-900 text-white text-center">
                     <th class="p-2 border-b border-copa-teal dark:border-slate-700 font-bold min-w-[70px]">Hora</th>`;
@@ -1263,47 +1360,47 @@
                 thead.innerHTML = htmlHeader;
             }
 
-            // 2. Renderizar Linhas de Horários e Células Clicáveis
             horarios.forEach((horario, index) => {
                 const tr = document.createElement('tr');
                 tr.className = index % 2 === 0 
                     ? 'bg-white dark:bg-slate-800' 
                     : 'bg-slate-50 dark:bg-slate-800/50';
 
-                let html = `<td class="p-2 border border-slate-200 dark:border-slate-700 text-center font-bold text-copa-teal dark:text-amber-400 text-[10px]">${horario.split(' - ')[0]}</td>`;
+                const horaInicio = horario.split(' - ')[0];
+                let html = `<td class="p-2 border border-slate-200 dark:border-slate-700 text-center font-bold text-copa-teal dark:text-amber-400 text-[10px]">${horaInicio}</td>`;
 
                 diasSemanaInfo.forEach(dia => {
                     const chaveHorario = horario.replace(':', 'h');
                     const reserva = reservas[dia.chaveData]?.[chaveHorario];
                     const ehMinhaReserva = usuarioSessao && reserva && reserva.email === usuarioSessao.email;
 
-                    // Aplica opacidade quando o filtro "Minhas" está ativo para esmaecer reuniões de terceiros
                     const opacidadeFiltro = (filtroMinhasReunioes && !ehMinhaReserva) ? 'opacity-25' : 'opacity-100';
 
                     if (reserva) {
+                        const textoTooltip = `Reunião: ${reserva.assunto}\nOrganizador: ${reserva.responsavel}\nSetor: ${reserva.setor || '-'}\nE-mail: ${reserva.email || '-'}`;
+
                         if (ehMinhaReserva) {
-                            // Reunião do Próprio Usuário -> Destaque Verde
                             html += `
-                                <td class="p-1 border border-slate-200 dark:border-slate-700 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-bold text-[9px] text-center ${opacidadeFiltro}">
+                                <td class="p-1 border border-slate-200 dark:border-slate-700 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-bold text-[9px] text-center ${opacidadeFiltro}" title="${textoTooltip}">
                                     <span class="block text-emerald-700 dark:text-emerald-400 font-black truncate">${reserva.responsavel.split(' ')[0]}</span>
                                     <span class="text-[8px] bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 px-1 rounded">Você</span>
                                 </td>
                             `;
                         } else {
-                            // Reunião de Outro Colaborador -> Tom Laranja
                             html += `
-                                <td class="p-1.5 border border-slate-200 dark:border-slate-700 bg-orange-100 dark:bg-orange-950/40 text-copa-teal dark:text-amber-200 font-bold text-[9px] text-center ${opacidadeFiltro}">
+                                <td class="p-1.5 border border-slate-200 dark:border-slate-700 bg-orange-100 dark:bg-orange-950/40 text-copa-teal dark:text-amber-200 font-bold text-[9px] text-center ${opacidadeFiltro}" title="${textoTooltip}">
                                     <span class="block text-copa-orange font-black truncate">${reserva.responsavel.split(' ')[0]}</span>
                                 </td>
                             `;
                         }
                     } else {
-                        // Célula Livre -> Clicável para Agendamento Rápido
                         html += `
                             <td class="p-1 border border-slate-200 dark:border-slate-700 text-center">
                                 <button onclick="agendarRapidoSemanal('${dia.chaveData}', '${horario}')" 
-                                        class="w-full h-full py-1 text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded transition text-[9px] font-semibold">
-                                    Livre
+                                        title="Reservar para ${dia.nome} às ${horaInicio}"
+                                        class="w-full h-full py-1 text-slate-400 dark:text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 hover:font-bold rounded transition-all duration-150 text-[9px] group">
+                                    <span class="group-hover:hidden">Livre</span>
+                                    <span class="hidden group-hover:inline">+ ${horaInicio}</span>
                                 </button>
                             </td>
                         `;
@@ -1315,7 +1412,6 @@
             });
         }
 
-        // Função de Agendamento Rápido por Clique na Visão Semanal
         function agendarRapidoSemanal(dataIso, horario) {
             document.getElementById('inputData').value = dataIso;
             atualizarData();
@@ -1375,8 +1471,16 @@
                 solicitarIdentificacao();
             }
 
+            // Regista o Service Worker para suporte PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js').catch(err => {
+                    console.log('Erro ao registrar Service Worker PWA:', err);
+                });
+            }
+
             setInterval(() => {
                 if (modoVisao === 'dia') renderTabelaDiaria();
+                verificarAutoCancelamentoSemCheckIn();
             }, 60000);
         });
     </script>
