@@ -698,26 +698,29 @@
             renderTabela();
         }
 
+        // CORREÇÃO DOS ÍCONES DOS BOTÕES DE FILTRO
         function atualizarBotoesFiltro() {
             const btnLivres = document.getElementById('btnFiltroLivres');
-            const labelLivres = document.getElementById('labelFiltroLivres');
             const btnMinhas = document.getElementById('btnFiltroMinhas');
-            const labelMinhas = document.getElementById('labelFiltroMinhas');
 
             if (filtroApenasLivres) {
                 btnLivres.className = "bg-emerald-600 text-white font-bold px-2.5 py-2 sm:py-1.5 rounded-lg transition text-[11px] flex items-center justify-center gap-1 shadow-sm";
-                labelLivres.innerText = "Livres";
+                btnLivres.innerHTML = `<i data-lucide="filter" class="w-3.5 h-3.5 text-white"></i><span id="labelFiltroLivres">Livres</span>`;
             } else {
                 btnLivres.className = "bg-slate-100 dark:bg-slate-700 hover:bg-emerald-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-2 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center justify-center gap-1";
-                labelLivres.innerText = "Livres";
+                btnLivres.innerHTML = `<i data-lucide="filter" class="w-3.5 h-3.5 text-copa-orange"></i><span id="labelFiltroLivres">Livres</span>`;
             }
 
             if (filtroMinhasReunioes) {
                 btnMinhas.className = "bg-copa-orange text-white font-bold px-2.5 py-2 sm:py-1.5 rounded-lg transition text-[11px] flex items-center justify-center gap-1 shadow-sm";
-                labelMinhas.innerText = "Minhas";
+                btnMinhas.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5 text-white"></i><span id="labelFiltroMinhas">Minhas</span>`;
             } else {
                 btnMinhas.className = "bg-slate-100 dark:bg-slate-700 hover:bg-amber-100 text-slate-700 dark:text-slate-200 font-bold px-2.5 py-2 sm:py-1.5 rounded-lg border border-slate-200 dark:border-slate-600 transition text-[11px] flex items-center justify-center gap-1";
-                labelMinhas.innerText = "Minhas";
+                btnMinhas.innerHTML = `<i data-lucide="user" class="w-3.5 h-3.5 text-copa-orange"></i><span id="labelFiltroMinhas">Minhas</span>`;
+            }
+
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
             }
         }
 
@@ -1210,22 +1213,57 @@
             });
         }
 
+        // VISÃO SEMANAL MELHORADA (Destaque do Dia Atual, Agendamento Rápido por Clique e Cores)
         function renderTabelaSemanal() {
             const tbody = document.getElementById('tabelaSemanal');
+            const containerGradeSemanal = document.getElementById('containerGradeSemanal');
+            const thead = containerGradeSemanal.querySelector('thead');
+            
             tbody.innerHTML = '';
             
-            const dataBase = new Date(getDataAtualChave());
+            const dataBase = new Date(getDataAtualChave() + 'T00:00:00');
             const diaSemana = dataBase.getDay();
             const seg = new Date(dataBase);
             seg.setDate(dataBase.getDate() - (diaSemana === 0 ? 6 : diaSemana - 1));
 
-            const diasSemanaChaves = [];
+            const diasSemanaInfo = [];
+            const nomesDias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'];
+            const hojeIso = new Date().toISOString().split('T')[0];
+
             for (let i = 0; i < 5; i++) {
                 const d = new Date(seg);
                 d.setDate(seg.getDate() + i);
-                diasSemanaChaves.push(d.toISOString().split('T')[0]);
+                const isoDate = d.toISOString().split('T')[0];
+                diasSemanaInfo.push({
+                    nome: nomesDias[i],
+                    chaveData: isoDate,
+                    ehHoje: isoDate === hojeIso
+                });
             }
 
+            // 1. Atualizar Cabeçalho com Destaque para o Dia Atual ("Hoje")
+            if (thead) {
+                let htmlHeader = `<tr class="bg-copa-teal dark:bg-slate-900 text-white text-center">
+                    <th class="p-2 border-b border-copa-teal dark:border-slate-700 font-bold min-w-[70px]">Hora</th>`;
+                
+                diasSemanaInfo.forEach(d => {
+                    const estiloHoje = d.ehHoje 
+                        ? 'bg-emerald-600/30 text-emerald-300 font-black border-b-2 border-emerald-400' 
+                        : 'font-semibold';
+                    
+                    htmlHeader += `
+                        <th class="p-2 border-b border-copa-teal dark:border-slate-700 ${estiloHoje}">
+                            <div class="flex items-center justify-center gap-1">
+                                <span>${d.nome}</span>
+                                ${d.ehHoje ? '<span class="text-[8px] bg-emerald-500 text-slate-950 px-1 py-0.2 rounded font-extrabold uppercase ml-1">Hoje</span>' : ''}
+                            </div>
+                        </th>`;
+                });
+                htmlHeader += `</tr>`;
+                thead.innerHTML = htmlHeader;
+            }
+
+            // 2. Renderizar Linhas de Horários e Células Clicáveis
             horarios.forEach((horario, index) => {
                 const tr = document.createElement('tr');
                 tr.className = index % 2 === 0 
@@ -1234,24 +1272,54 @@
 
                 let html = `<td class="p-2 border border-slate-200 dark:border-slate-700 text-center font-bold text-copa-teal dark:text-amber-400 text-[10px]">${horario.split(' - ')[0]}</td>`;
 
-                diasSemanaChaves.forEach(chaveData => {
+                diasSemanaInfo.forEach(dia => {
                     const chaveHorario = horario.replace(':', 'h');
-                    const reserva = reservas[chaveData]?.[chaveHorario];
+                    const reserva = reservas[dia.chaveData]?.[chaveHorario];
+                    const ehMinhaReserva = usuarioSessao && reserva && reserva.email === usuarioSessao.email;
+
+                    // Aplica opacidade quando o filtro "Minhas" está ativo para esmaecer reuniões de terceiros
+                    const opacidadeFiltro = (filtroMinhasReunioes && !ehMinhaReserva) ? 'opacity-25' : 'opacity-100';
 
                     if (reserva) {
+                        if (ehMinhaReserva) {
+                            // Reunião do Próprio Usuário -> Destaque Verde
+                            html += `
+                                <td class="p-1 border border-slate-200 dark:border-slate-700 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-200 font-bold text-[9px] text-center ${opacidadeFiltro}">
+                                    <span class="block text-emerald-700 dark:text-emerald-400 font-black truncate">${reserva.responsavel.split(' ')[0]}</span>
+                                    <span class="text-[8px] bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 px-1 rounded">Você</span>
+                                </td>
+                            `;
+                        } else {
+                            // Reunião de Outro Colaborador -> Tom Laranja
+                            html += `
+                                <td class="p-1.5 border border-slate-200 dark:border-slate-700 bg-orange-100 dark:bg-orange-950/40 text-copa-teal dark:text-amber-200 font-bold text-[9px] text-center ${opacidadeFiltro}">
+                                    <span class="block text-copa-orange font-black truncate">${reserva.responsavel.split(' ')[0]}</span>
+                                </td>
+                            `;
+                        }
+                    } else {
+                        // Célula Livre -> Clicável para Agendamento Rápido
                         html += `
-                            <td class="p-1.5 border border-slate-200 dark:border-slate-700 bg-orange-100 dark:bg-orange-950/40 text-copa-teal dark:text-amber-200 font-bold text-[9px] text-center">
-                                <span class="block text-copa-orange font-black truncate">${reserva.responsavel.split(' ')[0]}</span>
+                            <td class="p-1 border border-slate-200 dark:border-slate-700 text-center">
+                                <button onclick="agendarRapidoSemanal('${dia.chaveData}', '${horario}')" 
+                                        class="w-full h-full py-1 text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded transition text-[9px] font-semibold">
+                                    Livre
+                                </button>
                             </td>
                         `;
-                    } else {
-                        html += `<td class="p-1.5 border border-slate-200 dark:border-slate-700 text-center text-slate-300 dark:text-slate-600 text-[9px]">Livre</td>`;
                     }
                 });
 
                 tr.innerHTML = html;
                 tbody.appendChild(tr);
             });
+        }
+
+        // Função de Agendamento Rápido por Clique na Visão Semanal
+        function agendarRapidoSemanal(dataIso, horario) {
+            document.getElementById('inputData').value = dataIso;
+            atualizarData();
+            abrirModalNovaReserva(horario);
         }
 
         function atualizarData() {
