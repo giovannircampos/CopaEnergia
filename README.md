@@ -55,14 +55,6 @@ Este projeto foi desenvolvido para resolver conflitos de horários e otimizar a 
 
 ---
 
-## 🚀 Como Executar o Projeto
-
-Como a aplicação foi construída com tecnologias web puras e Firebase Realtime Database, não é necessária a instalação de dependências ou servidores Node.js.
-
-1. **Clonar o Repositório:**
-   ```bash
-   git clone [https://github.com/giovannircampos/CopaEnergia.git](https://github.com/giovannircampos/CopaEnergia.git)
-
 ## 👤 Autor
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/giovanni-rocha-51485031a/)
