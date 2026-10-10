@@ -36,20 +36,6 @@
                             borderOrange: '#FCD8C1',
                             grayBg: '#F4F6F5'
                         }
-                    },
-                    keyframes: {
-                        highlightGreen: {
-                            '0%': { backgroundColor: '#d1fae5' },
-                            '100%': { backgroundColor: 'transparent' }
-                        },
-                        highlightRed: {
-                            '0%': { backgroundColor: '#fee2e2' },
-                            '100%': { backgroundColor: 'transparent' }
-                        }
-                    },
-                    animation: {
-                        highlightGreen: 'highlightGreen 2s ease-out',
-                        highlightRed: 'highlightRed 2s ease-out'
                     }
                 }
             }
@@ -149,19 +135,27 @@
                 <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Consulta de histórico e agendamento de reuniões corporativas.</p>
             </div>
 
-            <div class="hidden sm:flex flex-wrap gap-2">
-                <button onclick="abrirModalNovaReserva()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
-                    <i data-lucide="calendar-plus" class="w-4 h-4"></i>
-                    Nova Reserva
+            <div class="flex items-center gap-2">
+                <!-- BOTÃO DE INSTALAÇÃO DO PWA NA TELA INICIAL -->
+                <button id="btnInstalarApp" onclick="instalarPWA()" class="hidden flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-2 sm:py-2.5 rounded-lg transition-colors shadow-sm">
+                    <i data-lucide="download-cloud" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Instalar App</span>
                 </button>
-                <button onclick="abrirHistoricoModal()" class="flex items-center gap-2 bg-copa-teal hover:bg-copa-darkTeal dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-semibold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
-                    <i data-lucide="history" class="w-4 h-4 text-copa-orange"></i>
-                    Auditoria
-                </button>
-                <button onclick="window.print()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm border border-slate-300 dark:border-slate-600">
-                    <i data-lucide="printer" class="w-4 h-4"></i>
-                    PDF
-                </button>
+
+                <div class="hidden sm:flex flex-wrap gap-2">
+                    <button onclick="abrirModalNovaReserva()" class="flex items-center gap-2 bg-copa-orange hover:bg-orange-600 text-white font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
+                        <i data-lucide="calendar-plus" class="w-4 h-4"></i>
+                        Nova Reserva
+                    </button>
+                    <button onclick="abrirHistoricoModal()" class="flex items-center gap-2 bg-copa-teal hover:bg-copa-darkTeal dark:bg-slate-700 dark:hover:bg-slate-600 text-white font-semibold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm">
+                        <i data-lucide="history" class="w-4 h-4 text-copa-orange"></i>
+                        Auditoria
+                    </button>
+                    <button onclick="window.print()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold text-xs px-3.5 py-2.5 rounded-lg transition-colors shadow-sm border border-slate-300 dark:border-slate-600">
+                        <i data-lucide="printer" class="w-4 h-4"></i>
+                        PDF
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -572,6 +566,42 @@
         let dadosUltimaReserva = null;
         let notificacaoEnviadaHoje = {};
         let notificacoesAtivas = localStorage.getItem('copa_notificacoes_ativas') === 'true';
+
+        // --- LÓGICA DE INSTALAÇÃO DO PWA ---
+        let eventoInstalacaoPWA = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            eventoInstalacaoPWA = e;
+            
+            const btn = document.getElementById('btnInstalarApp');
+            if (btn) btn.classList.remove('hidden');
+        });
+
+        async function instalarPWA() {
+            if (eventoInstalacaoPWA) {
+                eventoInstalacaoPWA.prompt();
+                const { outcome } = await eventoInstalacaoPWA.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('Utilizador aceitou a instalação.');
+                }
+                eventoInstalacaoPWA = null;
+                const btn = document.getElementById('btnInstalarApp');
+                if (btn) btn.classList.add('hidden');
+            } else {
+                const ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                if (ehIOS) {
+                    alert('Para instalar no iPhone:\n\n1. Clica no botão Partilhar (ícone do quadrado com seta no Safari).\n2. Seleciona "Adicionar ao ecrã principal".');
+                } else {
+                    alert('A aplicação já está instalada ou o teu navegador não suporta a instalação direta por botão.');
+                }
+            }
+        }
+
+        window.addEventListener('appinstalled', () => {
+            const btn = document.getElementById('btnInstalarApp');
+            if (btn) btn.classList.add('hidden');
+        });
 
         // MONITOR DE CONEXÃO FIREBASE EM TEMPO REAL
         function monitorarConexaoFirebase() {
