@@ -1311,7 +1311,7 @@
             });
         }
 
-        // VISÃO SEMANAL MELHORADA
+        // VISÃO SEMANAL CORRIGIDA
         function renderTabelaSemanal() {
             const tbody = document.getElementById('tabelaSemanal');
             const containerGradeSemanal = document.getElementById('containerGradeSemanal');
@@ -1374,6 +1374,9 @@
                     const reserva = reservas[dia.chaveData]?.[chaveHorario];
                     const ehMinhaReserva = usuarioSessao && reserva && reserva.email === usuarioSessao.email;
 
+                    // Valida se o horário e dia em questão já passaram
+                    const passou = ehHorarioPassado(horario, dia.chaveData);
+
                     const opacidadeFiltro = (filtroMinhasReunioes && !ehMinhaReserva) ? 'opacity-25' : 'opacity-100';
 
                     if (reserva) {
@@ -1393,12 +1396,20 @@
                                 </td>
                             `;
                         }
+                    } else if (passou) {
+                        // Exibe bloqueado/encerrado para horários que já passaram
+                        html += `
+                            <td class="p-1 border border-slate-200 dark:border-slate-700 text-center bg-slate-100/50 dark:bg-slate-800/80">
+                                <span class="text-slate-300 dark:text-slate-600 text-[9px] font-semibold italic block">Encerrado</span>
+                            </td>
+                        `;
                     } else {
+                        // Exibe ativo apenas para horários futuros
                         html += `
                             <td class="p-1 border border-slate-200 dark:border-slate-700 text-center">
                                 <button onclick="agendarRapidoSemanal('${dia.chaveData}', '${horario}')" 
                                         title="Reservar para ${dia.nome} às ${horaInicio}"
-                                        class="w-full h-full py-1 text-slate-400 dark:text-slate-500 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 hover:font-bold rounded transition-all duration-150 text-[9px] group">
+                                        class="w-full h-full py-1 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/60 hover:font-bold rounded transition-all duration-150 text-[9px] group font-semibold">
                                     <span class="group-hover:hidden">Livre</span>
                                     <span class="hidden group-hover:inline">+ ${horaInicio}</span>
                                 </button>
