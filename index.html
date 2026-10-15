@@ -547,6 +547,20 @@
         </div>
     </div>
 
+    <!-- MODAL CUSTOMIZADO DE ALERTA (SUBSTITUI OS ALERTS NATIVOS DO NAVEGADOR) -->
+    <div id="modalAlerta" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
+        <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-sm w-full p-5 shadow-2xl border-t-4 border-copa-orange text-center text-slate-800 dark:text-slate-100">
+            <div class="w-10 h-10 bg-copa-lightOrange dark:bg-orange-950/60 text-copa-orange rounded-full flex items-center justify-center mx-auto mb-2">
+                <i data-lucide="info" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-base font-bold text-copa-teal dark:text-amber-400 mb-2">Aviso</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-300 mb-5" id="textoModalAlerta"></p>
+            <button onclick="fecharModalAlerta()" class="w-full bg-copa-orange hover:bg-orange-600 text-white font-bold py-2.5 px-4 rounded-lg text-xs min-h-[44px] transition">
+                Entendido
+            </button>
+        </div>
+    </div>
+
     <!-- SCRIPT DE LÓGICA DO SISTEMA -->
     <script>
         const horarios = [
@@ -582,6 +596,19 @@
         let notificacaoEnviadaHoje = {};
         let notificacoesAtivas = localStorage.getItem('copa_notificacoes_ativas') === 'true';
 
+        // FUNÇÃO DE ALERTA PERSONALIZADA (SEM EXIBIR O DOMÍNIO GITHUB.IO)
+        function mostrarAlerta(mensagem) {
+            document.getElementById('textoModalAlerta').innerText = mensagem;
+            document.getElementById('modalAlerta').classList.remove('hidden');
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
+            }
+        }
+
+        function fecharModalAlerta() {
+            document.getElementById('modalAlerta').classList.add('hidden');
+        }
+
         // MONITOR DE CONEXÃO FIREBASE EM TEMPO REAL
         function monitorarConexaoFirebase() {
             db.ref('.info/connected').on('value', (snap) => {
@@ -604,7 +631,7 @@
             const chaveData = getDataAtualChave();
             const chaveHorario = horarioSlot.replace(':', 'h');
             refReservas.child(chaveData).child(chaveHorario).update({ checkedIn: true });
-            alert("Check-in realizado com sucesso! A sala está confirmada.");
+            mostrarAlerta("Check-in realizado com sucesso! A sala está confirmada.");
         }
 
         function verificarAutoCancelamentoSemCheckIn() {
@@ -647,7 +674,7 @@
         function alternarNotificacoes() {
             if (!notificacoesAtivas) {
                 if (!("Notification" in window)) {
-                    alert("Este navegador não suporta notificações de sistema.");
+                    mostrarAlerta("Este navegador não suporta notificações de sistema.");
                     return;
                 }
 
@@ -657,7 +684,7 @@
                         localStorage.setItem('copa_notificacoes_ativas', 'true');
                         atualizarVisualToggleNotificacao();
                     } else {
-                        alert("Permissão de notificação negada no navegador.");
+                        mostrarAlerta("Permissão de notificação negada no navegador.");
                     }
                 });
             } else {
@@ -762,16 +789,16 @@
         function salvarIdentificacao() {
             const nome = document.getElementById('inputNomeUsuario').value.trim();
             const setor = document.getElementById('inputSetorUsuario').value.trim();
-            const email = document.getElementById('inputEmailUsuario').value.trim().toLowerCase(); // Normaliza para minúsculas
+            const email = document.getElementById('inputEmailUsuario').value.trim().toLowerCase();
             const pin = document.getElementById('inputPinUsuario').value.trim();
 
             if (!nome || !setor || !email || !pin || pin.length < 4) {
-                alert('Por favor, preencha o Nome, Setor, E-mail e o PIN de 4 números.');
+                mostrarAlerta('Por favor, preencha o Nome, Setor, E-mail e o PIN de 4 números.');
                 return;
             }
 
             if (!email.endsWith('@copaenergia.com.br')) {
-                alert('Por favor, utilize um e-mail corporativo (@copaenergia.com.br).');
+                mostrarAlerta('Por favor, utilize um e-mail corporativo (@copaenergia.com.br).');
                 return;
             }
 
@@ -868,7 +895,6 @@
             renderTabela();
         }
 
-        // AGENDAMENTO COM SUPORTE A RECORRÊNCIA
         function abrirModalNovaReserva(horarioInicioSugerido) {
             if (!usuarioSessao) {
                 solicitarIdentificacao();
@@ -879,7 +905,7 @@
             const hojeData = new Date().toISOString().split('T')[0];
 
             if (chaveData < hojeData) {
-                alert('Não é possível agendar em datas passadas.');
+                mostrarAlerta('Não é possível agendar em datas passadas.');
                 return;
             }
 
@@ -969,12 +995,12 @@
             const hojeData = new Date().toISOString().split('T')[0];
 
             if (chaveDataOriginal < hojeData) {
-                alert('Não é possível agendar em datas passadas.');
+                mostrarAlerta('Não é possível agendar em datas passadas.');
                 return;
             }
 
             if (!assunto || !hInicio || !hFim) {
-                alert('Por favor, preencha todos os campos obrigatórios.');
+                mostrarAlerta('Por favor, preencha todos os campos obrigatórios.');
                 return;
             }
 
@@ -983,7 +1009,6 @@
                 return inSlot >= hInicio && fimSlot <= hFim;
             });
 
-            // Processa semanas de recorrencia
             for (let sem = 0; sem < semanasRecorrencia; sem++) {
                 const d = new Date(chaveDataOriginal + 'T00:00:00');
                 d.setDate(d.getDate() + (sem * 7));
@@ -994,7 +1019,7 @@
                         horarioOriginal: slot,
                         responsavel: usuarioSessao.nome,
                         setor: usuarioSessao.setor || '-',
-                        email: usuarioSessao.email.trim().toLowerCase(), // Garante e-mail normalizado na reserva
+                        email: usuarioSessao.email.trim().toLowerCase(),
                         assunto: assunto,
                         criadoPor: usuarioSessao.nome,
                         criadoEm: new Date().toLocaleString('pt-BR'),
@@ -1020,7 +1045,7 @@
         function estenderReuniaoRapida(horarioAtualSlot) {
             const idxAtual = horarios.indexOf(horarioAtualSlot);
             if (idxAtual === -1 || idxAtual === horarios.length - 1) {
-                alert('Não há mais horários disponíveis para prorrogação hoje.');
+                mostrarAlerta('Não há mais horários disponíveis para prorrogação hoje.');
                 return;
             }
 
@@ -1030,7 +1055,7 @@
             const chaveSlotAtual = horarioAtualSlot.replace(':', 'h');
 
             if (reservas[chaveData]?.[chaveProximoSlot]) {
-                alert(`O próximo horário (${proximoSlot}) já está reservado por outro colega.`);
+                mostrarAlerta(`O próximo horário (${proximoSlot}) já está reservado por outro colega.`);
                 return;
             }
 
@@ -1048,7 +1073,7 @@
                 checkedIn: true
             });
 
-            alert(`Reunião prorrogada com sucesso até ${proximoSlot.split(' - ')[1]}!`);
+            mostrarAlerta(`Reunião prorrogada com sucesso até ${proximoSlot.split(' - ')[1]}!`);
         }
 
         function gerarLinksAgendaTeams(dados) {
@@ -1120,12 +1145,12 @@
             const pinDigitado = document.getElementById('inputPinCancelamento').value.trim();
 
             if (!motivo) {
-                alert('Por favor, informe o motivo.');
+                mostrarAlerta('Por favor, informe o motivo.');
                 return;
             }
 
             if (!pinDigitado || pinDigitado !== usuarioSessao.pin) {
-                alert('PIN de segurança incorreto.');
+                mostrarAlerta('PIN de segurança incorreto.');
                 return;
             }
 
@@ -1151,7 +1176,7 @@
             }
 
             fecharModalCancelar();
-            alert('Cancelamento registrado com sucesso.');
+            mostrarAlerta('Cancelamento registrado com sucesso.');
         }
 
         function obterHorarioAtualHHMM() {
@@ -1220,7 +1245,6 @@
 
                 if (filtroApenasLivres && reserva) return;
                 
-                // Normaliza os e-mails para garantir que batem entre PC e Celular
                 if (filtroMinhasReunioes) {
                     if (!reserva) return;
                     const emailReserva = (reserva.email || '').trim().toLowerCase();
@@ -1337,7 +1361,6 @@
             });
         }
 
-        // VISÃO SEMANAL CORRIGIDA
         function renderTabelaSemanal() {
             const tbody = document.getElementById('tabelaSemanal');
             const containerGradeSemanal = document.getElementById('containerGradeSemanal');
@@ -1403,7 +1426,6 @@
                     const emailSessao = (usuarioSessao?.email || '').trim().toLowerCase();
                     const ehMinhaReserva = usuarioSessao && reserva && (emailReserva === emailSessao);
 
-                    // Valida se o horário e dia em questão já passaram
                     const passou = ehHorarioPassado(horario, dia.chaveData);
 
                     const opacidadeFiltro = (filtroMinhasReunioes && !ehMinhaReserva) ? 'opacity-25' : 'opacity-100';
@@ -1426,14 +1448,12 @@
                             `;
                         }
                     } else if (passou) {
-                        // Exibe bloqueado/encerrado para horários que já passaram
                         html += `
                             <td class="p-1 border border-slate-200 dark:border-slate-700 text-center bg-slate-100/50 dark:bg-slate-800/80">
                                 <span class="text-slate-300 dark:text-slate-600 text-[9px] font-semibold italic block">Encerrado</span>
                             </td>
                         `;
                     } else {
-                        // Exibe ativo apenas para horários futuros
                         html += `
                             <td class="p-1 border border-slate-200 dark:border-slate-700 text-center">
                                 <button onclick="agendarRapidoSemanal('${dia.chaveData}', '${horario}')" 
@@ -1511,7 +1531,6 @@
                 solicitarIdentificacao();
             }
 
-            // Regista o Service Worker para suporte PWA
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('./sw.js').catch(err => {
                     console.log('Erro ao registrar Service Worker PWA:', err);
