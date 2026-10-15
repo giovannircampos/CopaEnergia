@@ -131,10 +131,9 @@
             <button onclick="alternarModoEscuro()" class="p-2 bg-slate-700/50 hover:bg-slate-700 text-white rounded-lg transition-colors shadow-sm" title="Alternar Modo Escuro/Claro">
                 <i data-lucide="moon" id="iconeTheme" class="w-4 h-4"></i>
             </button>
-            <button onclick="solicitarIdentificacao()" class="flex items-center gap-1.5 bg-copa-orange hover:bg-orange-600 text-white font-semibold text-xs px-2.5 py-2 sm:px-3.5 rounded-lg transition-colors shadow-sm">
-                <i data-lucide="user-check" class="w-4 h-4"></i>
-                <span class="hidden sm:inline">Trocar Perfil</span>
-            </button>
+
+            <!-- BOTÃO DINÂMICO ENTRAR / SAIR -->
+            <div id="containerBtnAuth"></div>
         </div>
     </div>
 
@@ -372,7 +371,7 @@
                 </div>
             </div>
 
-            <!-- CAIXA DE MENSAGEM DE ERRO/AVISO EM TELA (SUBSTITUI OS ALERTS NATIVOS DO NAVEGADOR) -->
+            <!-- CAIXA DE MENSAGEM DE ERRO/AVISO EM TELA -->
             <div id="erroIdentificacao" class="hidden bg-rose-50 text-rose-600 p-2.5 rounded-lg border border-rose-200 text-xs font-semibold mb-3"></div>
 
             <div class="space-y-3 text-xs">
@@ -394,8 +393,11 @@
                 </div>
             </div>
 
-            <div class="mt-5">
-                <button onclick="salvarIdentificacao()" class="w-full bg-copa-orange hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-colors shadow-sm text-xs min-h-[44px]">
+            <div class="mt-5 flex gap-2">
+                <button onclick="fecharModalIdentificacao()" class="flex-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-3 rounded-lg text-xs min-h-[44px]">
+                    Cancelar
+                </button>
+                <button onclick="salvarIdentificacao()" class="flex-1 bg-copa-orange hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition-colors shadow-sm text-xs min-h-[44px]">
                     Confirmar e Acessar
                 </button>
             </div>
@@ -550,7 +552,7 @@
         </div>
     </div>
 
-    <!-- MODAL CUSTOMIZADO DE ALERTA (SUBSTITUI OS ALERTS NATIVOS DO NAVEGADOR) -->
+    <!-- MODAL CUSTOMIZADO DE ALERTA -->
     <div id="modalAlerta" class="fixed inset-0 bg-black/60 hidden flex items-end sm:items-center justify-center p-0 sm:p-4 z-50">
         <div class="bg-white dark:bg-slate-800 rounded-t-2xl sm:rounded-xl max-w-sm w-full p-5 shadow-2xl border-t-4 border-copa-orange text-center text-slate-800 dark:text-slate-100">
             <div class="w-10 h-10 bg-copa-lightOrange dark:bg-orange-950/60 text-copa-orange rounded-full flex items-center justify-center mx-auto mb-2">
@@ -599,7 +601,6 @@
         let notificacaoEnviadaHoje = {};
         let notificacoesAtivas = localStorage.getItem('copa_notificacoes_ativas') === 'true';
 
-        // FUNÇÃO DE ALERTA PERSONALIZADA (SEM EXIBIR O DOMÍNIO GITHUB.IO)
         function mostrarAlerta(mensagem) {
             document.getElementById('textoModalAlerta').innerText = mensagem;
             document.getElementById('modalAlerta').classList.remove('hidden');
@@ -612,7 +613,6 @@
             document.getElementById('modalAlerta').classList.add('hidden');
         }
 
-        // MONITOR DE CONEXÃO FIREBASE EM TEMPO REAL
         function monitorarConexaoFirebase() {
             db.ref('.info/connected').on('value', (snap) => {
                 const dot = document.getElementById('dotConexao');
@@ -629,7 +629,6 @@
             });
         }
 
-        // CONFIRMAÇÃO DE PRESENÇA (CHECK-IN) E AUTO-LIBERTAÇÃO DE SALA
         function realizarCheckIn(horarioSlot) {
             const chaveData = getDataAtualChave();
             const chaveHorario = horarioSlot.replace(':', 'h');
@@ -686,14 +685,18 @@
                         notificacoesAtivas = true;
                         localStorage.setItem('copa_notificacoes_ativas', 'true');
                         atualizarVisualToggleNotificacao();
+                        mostrarAlerta("Avisos e notificações ativados com sucesso!");
+                    } else if (permission === "denied") {
+                        mostrarAlerta("As notificações estão bloqueadas nas configurações do seu navegador.");
                     } else {
-                        mostrarAlerta("Permissão de notificação negada no navegador.");
+                        mostrarAlerta("Permissão de notificação não foi concedida.");
                     }
                 });
             } else {
                 notificacoesAtivas = false;
                 localStorage.setItem('copa_notificacoes_ativas', 'false');
                 atualizarVisualToggleNotificacao();
+                mostrarAlerta("Avisos desativados.");
             }
         }
 
@@ -792,6 +795,20 @@
             document.getElementById('modalIdentificacao').classList.remove('hidden');
         }
 
+        function fecharModalIdentificacao() {
+            document.getElementById('modalIdentificacao').classList.add('hidden');
+        }
+
+        function encerrarSessaoUsuario() {
+            localStorage.removeItem('copa_usuario_atual');
+            usuarioSessao = null;
+            if (filtroMinhasReunioes) filtroMinhasReunioes = false;
+            atualizarHeaderUsuario();
+            atualizarBotoesFiltro();
+            renderTabela();
+            mostrarAlerta('Você saiu da sua conta.');
+        }
+
         function salvarIdentificacao() {
             const nome = document.getElementById('inputNomeUsuario').value.trim();
             const setor = document.getElementById('inputSetorUsuario').value.trim();
@@ -830,10 +847,28 @@
 
         function atualizarHeaderUsuario() {
             const label = document.getElementById('labelUsuarioAtual');
+            const containerBtnAuth = document.getElementById('containerBtnAuth');
+
             if (usuarioSessao) {
                 label.innerText = `${usuarioSessao.nome} (${usuarioSessao.setor || 'Geral'})`;
+                containerBtnAuth.innerHTML = `
+                    <button onclick="encerrarSessaoUsuario()" class="flex items-center gap-1.5 bg-slate-700/60 hover:bg-rose-600/80 text-white font-semibold text-xs px-2.5 py-2 sm:px-3.5 rounded-lg transition-colors shadow-sm border border-slate-600/50">
+                        <i data-lucide="log-out" class="w-4 h-4 text-rose-400"></i>
+                        <span class="hidden sm:inline">Sair</span>
+                    </button>
+                `;
             } else {
-                label.innerText = 'Não identificado (Toque para entrar)';
+                label.innerText = 'Não identificado';
+                containerBtnAuth.innerHTML = `
+                    <button onclick="solicitarIdentificacao()" class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs px-2.5 py-2 sm:px-3.5 rounded-lg transition-colors shadow-sm">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Entrar</span>
+                    </button>
+                `;
+            }
+
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
             }
         }
 
