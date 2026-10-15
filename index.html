@@ -562,7 +562,7 @@
             "17:00 - 17:30", "17:30 - 18:00"
         ];
 
-        // SVGs NATIVOS DOS BOTÕES DA TABELA (EVITA QUE O ÍCONE SUMA AO ATUALIZAR O DOM)
+        // SVGs NATIVOS DOS BOTÕES DA TABELA
         const svgIcons = {
             plus: `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>`,
             trash: `<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
@@ -689,7 +689,10 @@
         function verificarNotificacaoTermino(horarioSlot, reserva) {
             if (!notificacoesAtivas) return;
             if (Notification.permission !== "granted") return;
-            if (!usuarioSessao || reserva.email !== usuarioSessao.email) return;
+            
+            const emailReserva = (reserva.email || '').trim().toLowerCase();
+            const emailSessao = (usuarioSessao?.email || '').trim().toLowerCase();
+            if (!usuarioSessao || emailReserva !== emailSessao) return;
 
             const agora = new Date();
             const [hFim, mFim] = horarioSlot.split(' - ')[1].split(':').map(Number);
@@ -759,7 +762,7 @@
         function salvarIdentificacao() {
             const nome = document.getElementById('inputNomeUsuario').value.trim();
             const setor = document.getElementById('inputSetorUsuario').value.trim();
-            const email = document.getElementById('inputEmailUsuario').value.trim().toLowerCase();
+            const email = document.getElementById('inputEmailUsuario').value.trim().toLowerCase(); // Normaliza para minúsculas
             const pin = document.getElementById('inputPinUsuario').value.trim();
 
             if (!nome || !setor || !email || !pin || pin.length < 4) {
@@ -991,7 +994,7 @@
                         horarioOriginal: slot,
                         responsavel: usuarioSessao.nome,
                         setor: usuarioSessao.setor || '-',
-                        email: usuarioSessao.email,
+                        email: usuarioSessao.email.trim().toLowerCase(), // Garante e-mail normalizado na reserva
                         assunto: assunto,
                         criadoPor: usuarioSessao.nome,
                         criadoEm: new Date().toLocaleString('pt-BR'),
@@ -1038,7 +1041,7 @@
                 horarioOriginal: proximoSlot,
                 responsavel: reservaAtual.responsavel,
                 setor: reservaAtual.setor || '-',
-                email: reservaAtual.email,
+                email: reservaAtual.email.trim().toLowerCase(),
                 assunto: `${reservaAtual.assunto} (Prorrogado)`,
                 criadoPor: usuarioSessao.nome,
                 criadoEm: new Date().toLocaleString('pt-BR'),
@@ -1216,9 +1219,13 @@
                 const estaAcontecendoAgora = ehHorarioAtual(horario, chaveData);
 
                 if (filtroApenasLivres && reserva) return;
+                
+                // Normaliza os e-mails para garantir que batem entre PC e Celular
                 if (filtroMinhasReunioes) {
                     if (!reserva) return;
-                    if (usuarioSessao && reserva.email !== usuarioSessao.email) return;
+                    const emailReserva = (reserva.email || '').trim().toLowerCase();
+                    const emailSessao = (usuarioSessao?.email || '').trim().toLowerCase();
+                    if (emailReserva !== emailSessao) return;
                 }
 
                 const tr = document.createElement('tr');
@@ -1251,7 +1258,11 @@
                                </button>` 
                             : '';
 
-                        const btnCheckIn = (estaAcontecendoAgora && !reserva.checkedIn && usuarioSessao && reserva.email === usuarioSessao.email)
+                        const emailReserva = (reserva.email || '').trim().toLowerCase();
+                        const emailSessao = (usuarioSessao?.email || '').trim().toLowerCase();
+                        const ehDonoReserva = usuarioSessao && (emailReserva === emailSessao);
+
+                        const btnCheckIn = (estaAcontecendoAgora && !reserva.checkedIn && ehDonoReserva)
                             ? `<button onclick="realizarCheckIn('${horario}')" title="Confirmar Presença" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-1 rounded-md text-[10px] flex items-center gap-1 shadow-sm transition animate-bounce">
                                     ${svgIcons.checkCircle} Check-in
                                </button>`
@@ -1387,7 +1398,10 @@
                 diasSemanaInfo.forEach(dia => {
                     const chaveHorario = horario.replace(':', 'h');
                     const reserva = reservas[dia.chaveData]?.[chaveHorario];
-                    const ehMinhaReserva = usuarioSessao && reserva && reserva.email === usuarioSessao.email;
+                    
+                    const emailReserva = (reserva?.email || '').trim().toLowerCase();
+                    const emailSessao = (usuarioSessao?.email || '').trim().toLowerCase();
+                    const ehMinhaReserva = usuarioSessao && reserva && (emailReserva === emailSessao);
 
                     // Valida se o horário e dia em questão já passaram
                     const passou = ehHorarioPassado(horario, dia.chaveData);
