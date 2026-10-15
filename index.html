@@ -372,6 +372,9 @@
                 </div>
             </div>
 
+            <!-- CAIXA DE MENSAGEM DE ERRO/AVISO EM TELA (SUBSTITUI OS ALERTS NATIVOS DO NAVEGADOR) -->
+            <div id="erroIdentificacao" class="hidden bg-rose-50 text-rose-600 p-2.5 rounded-lg border border-rose-200 text-xs font-semibold mb-3"></div>
+
             <div class="space-y-3 text-xs">
                 <div>
                     <label class="block font-semibold text-slate-700 dark:text-slate-300 mb-1">Nome Completo *</label>
@@ -778,6 +781,9 @@
         }
 
         function solicitarIdentificacao() {
+            const boxErro = document.getElementById('erroIdentificacao');
+            if (boxErro) boxErro.classList.add('hidden');
+
             if (usuarioSessao) {
                 document.getElementById('inputNomeUsuario').value = usuarioSessao.nome || '';
                 document.getElementById('inputSetorUsuario').value = usuarioSessao.setor || '';
@@ -791,14 +797,27 @@
             const setor = document.getElementById('inputSetorUsuario').value.trim();
             const email = document.getElementById('inputEmailUsuario').value.trim().toLowerCase();
             const pin = document.getElementById('inputPinUsuario').value.trim();
+            const boxErro = document.getElementById('erroIdentificacao');
+
+            if (boxErro) boxErro.classList.add('hidden');
 
             if (!nome || !setor || !email || !pin || pin.length < 4) {
-                mostrarAlerta('Por favor, preencha o Nome, Setor, E-mail e o PIN de 4 números.');
+                if (boxErro) {
+                    boxErro.innerText = 'Por favor, preencha o Nome, Setor, E-mail e o PIN de 4 números.';
+                    boxErro.classList.remove('hidden');
+                } else {
+                    mostrarAlerta('Por favor, preencha o Nome, Setor, E-mail e o PIN de 4 números.');
+                }
                 return;
             }
 
             if (!email.endsWith('@copaenergia.com.br')) {
-                mostrarAlerta('Por favor, utilize um e-mail corporativo (@copaenergia.com.br).');
+                if (boxErro) {
+                    boxErro.innerText = 'Por favor, utilize um e-mail corporativo (@copaenergia.com.br).';
+                    boxErro.classList.remove('hidden');
+                } else {
+                    mostrarAlerta('Por favor, utilize um e-mail corporativo (@copaenergia.com.br).');
+                }
                 return;
             }
 
