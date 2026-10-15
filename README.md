@@ -10,48 +10,71 @@
 
 ---
 
-## 📌 Sobre o Projeto
+📅 Sistema de Agendamento de Sala de Reunião — Sala Sustentabilidade
+Uma aplicação web progressiva (PWA), moderna e em tempo real desenvolvida para otimizar o fluxo de agendamentos e a gestão da Sala Sustentabilidade na unidade da Copa Energia.
 
-Este projeto foi desenvolvido para resolver conflitos de horários e otimizar a utilização do espaço colaborativo da **Sala Sustentabilidade**. Com uma interface moderna e intuitiva, a aplicação permite que os colaboradores consultem a ocupação em tempo real, reservem blocos de horário e gerenciem os seus compromissos corporativos sem complicações.
+O sistema foi concebido para resolver conflitos de horários, automatizar a libertação de salas por falta de comparência e proporcionar uma experiência simples e fluida tanto no Computador como no Telemóvel.
 
----
+💡 Sobre o Projeto
+Em ambientes corporativos com elevado fluxo de reuniões, o uso ineficiente de salas de reunião (como reservas abandonadas ou sobreposição de horários) gera perda de produtividade.
 
-## ✨ Principais Funcionalidades
+Este projeto oferece uma solução centralizada, conectada em tempo real ao Firebase Realtime Database, permitindo que os colaboradores consultem disponibilidades, agendem slots de 30 minutos, realizem check-in presencial e sincronizem os seus compromissos diretamente com o Microsoft Teams, Outlook ou calendários nativos via ficheiro .ics.
 
-### 🗓️ Visualização de Agendamentos
-- **Visão Diária & Semanal:** Alternância simples entre a agenda do dia e a grelha completa da semana (Segunda a Sexta).
-- **Destaque do Dia Atual:** Marcação visual automática da coluna "Hoje" na visão semanal.
-- **Diferenciação por Cores:**
-  - 🟢 **Verde (Você):** Compromissos agendados pelo utilizador logado.
-  - 🟠 **Laranja (Copa):** Compromissos agendados por outros colaboradores.
-  - ⚪ **Livre:** Espaços disponíveis para reserva rápida com um único clique.
-- **Indicador de Ocupação:** Barra em tempo real que calcula a percentagem de ocupação do dia.
+✨ Funcionalidades Principais
+⏱️ Gestão Inteligente de Horários
+Visão Diária e Semanal: Consulta rápida do mapa de ocupação da sala por dia ou ao longo de toda a semana.
 
-### ⚡ Agendamento e Regras de Negócio
-- **Agendamento Rápido:** Clique direto em qualquer célula "Livre" para abrir o formulário pré-preenchido.
-- **Validação Anti-Conflito:** Impede a sobreposição de horários e bloqueia agendamentos simultâneos para o mesmo colaborador.
-- **Atalhos de Data:** Botões para navegação rápida entre "Hoje" e "Amanhã".
-- **Filtros Personalizados:**
-  - **Filtro "Minhas":** Esmaece as reuniões de terceiros para destacar apenas os seus compromissos.
-  - **Filtro "Livres":** Exibe apenas horários vagos.
+Grades Dinâmicas: Slots estruturados de 30 minutos (das 08:00 às 18:00).
 
-### 🔔 Notificações & Integrações
-- **Notificação Automática do Navegador:** Alerta nativo de encerramento emitido 5 minutos antes do fim da reunião.
-- **Exportação para Agenda:** Integração direta para adicionar a reunião ao **Outlook / Microsoft Teams** ou descarregar o ficheiro `.ics`.
-- **Modo Escuro / Claro:** Suporte a tema escuro ajustável com persistência em `localStorage`.
+Barra de Ocupação: Indicador visual em tempo real do percentual de uso da sala na data selecionada.
 
-### 🛡️ Segurança & Auditoria
-- **Autenticação por PIN:** Requer um PIN corporativo de 4 dígitos para autorizar cancelamentos.
-- **Log de Auditoria:** Registos gravados no Firebase com o motivo do cancelamento e quem executou a ação.
+🛡️ Validação & Autenticação Corporativa
+Perfil Integrado: Identificação com Nome, Setor, E-mail Corporativo (@copaenergia.com.br) e PIN de segurança de 4 dígitos.
 
----
+Ações Autenticadas: Cancelamentos e alterações exigem a validação do PIN do titular, garantindo a integridade dos dados.
 
-## 🛠️ Tecnologias Utilizadas
+Normalização de E-mail: Garantia de sincronização perfeita entre diferentes dispositivos (PC e telemóvel) independentemente da formatação de maiúsculas/minúsculas.
 
-- **Frontend:** HTML5, Tailwind CSS (via CDN) e Vanilla JavaScript (ES6+).
-- **Ícones:** Lucide Icons.
-- **Backend & Database:** Firebase Realtime Database.
-- **Estilização & Tipografia:** Google Fonts (*Montserrat*).
+🔄 Automação & Check-in
+Check-in Obrigatório: Botão para confirmar a presença no início da reunião.
+
+Libertação Automática (Auto-Cancel): Algoritmo que cancela automaticamente a reserva se o check-in não for realizado dentro de 10 minutos após o início do horário reservado.
+
+Prorrogação Rápida (+30m): Permite estender reuniões em andamento com um clique, caso o horário seguinte esteja livre.
+
+🔁 Agendamento Recorrente & Integrações
+Suporte a Recorrência: Opção de repetir reservas por 2, 3 ou 4 semanas consecutivas.
+
+Integração com Teams / Outlook: Gerador automático de links para adicionar a reunião ao calendário corporativo.
+
+Exportação .ics: Download direto de convite de calendário compatível com qualquer dispositivo.
+
+📊 Auditoria & Transparência
+Histórico de Alterações: Painel de auditoria que regista todos os cancelamentos, indicando o responsável, o motivo e o horário da ação.
+
+Sinalizador de Conexão: Indicador em tempo real do estado da conexão com a base de dados (Online/Offline).
+
+📱 Experiência do Utilizador (UI/UX)
+Modo Escuro (Dark Mode): Suporte nativo a temas Claro e Escuro.
+
+Interface Responsiva: Design otimizado para dispositivos móveis com barra de navegação inferior fixa.
+
+PWA (Progressive Web App): Pode ser instalado diretamente no telemóvel ou computador como uma aplicação nativa.
+
+Alertas Personalizados: Notificações e janelas modais integradas ao design do sistema (sem depender de pop-ups nativas do navegador).
+
+🛠️ Tecnologias Utilizadas
+Frontend: HTML5, JavaScript (ES6+)
+
+Estilização: Tailwind CSS (com suporte nativo a Dark Mode)
+
+Ícones: Lucide Icons
+
+Base de Dados em Tempo Real: Firebase Realtime Database
+
+PWA / Offline: Service Worker, Manifest JSON
+
+Tipografia: Google Fonts (Montserrat)
 
 ---
 
