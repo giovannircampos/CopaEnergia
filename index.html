@@ -1079,6 +1079,7 @@
                 const chaveDataAtual = obterDataLocalISO(d);
 
                 slotsAfetados.forEach(slot => {
+                    const jaAcontecendo = ehHorarioAtual(slot, chaveDataAtual);
                     refReservas.child(chaveDataAtual).child(slot.replace(':', 'h')).set({
                         horarioOriginal: slot,
                         responsavel: usuarioSessao.nome,
@@ -1087,7 +1088,7 @@
                         assunto: assunto,
                         criadoPor: usuarioSessao.nome,
                         criadoEm: new Date().toLocaleString('pt-BR'),
-                        checkedIn: false
+                        checkedIn: jaAcontecendo
                     });
                 });
             }
