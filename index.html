@@ -602,6 +602,14 @@
         let notificacaoEnviadaHoje = {};
         let notificacoesAtivas = localStorage.getItem('copa_notificacoes_ativas') === 'true';
 
+        // HELPER PARA EVITAR PROBLEMAS DE FUSO HORÁRIO EM DATA (YYYY-MM-DD LOCAL)
+        function obterDataLocalISO(data = new Date()) {
+            const ano = data.getFullYear();
+            const mes = String(data.getMonth() + 1).padStart(2, '0');
+            const dia = String(data.getDate()).padStart(2, '0');
+            return `${ano}-${mes}-${dia}`;
+        }
+
         function mostrarAlerta(mensagem) {
             document.getElementById('textoModalAlerta').innerText = mensagem;
             document.getElementById('modalAlerta').classList.remove('hidden');
@@ -639,7 +647,7 @@
 
         function verificarAutoCancelamentoSemCheckIn() {
             const chaveData = getDataAtualChave();
-            const hojeData = new Date().toISOString().split('T')[0];
+            const hojeData = obterDataLocalISO();
             if (chaveData !== hojeData) return;
 
             const agora = new Date();
@@ -874,13 +882,13 @@
         }
 
         function getDataAtualChave() {
-            return document.getElementById('inputData').value || new Date().toISOString().split('T')[0];
+            return document.getElementById('inputData').value || obterDataLocalISO();
         }
 
         function definirDataAtalho(diasAdicionais) {
             const d = new Date();
             d.setDate(d.getDate() + diasAdicionais);
-            document.getElementById('inputData').value = d.toISOString().split('T')[0];
+            document.getElementById('inputData').value = obterDataLocalISO(d);
             atualizarData();
         }
 
@@ -957,7 +965,7 @@
             }
 
             const chaveData = getDataAtualChave();
-            const hojeData = new Date().toISOString().split('T')[0];
+            const hojeData = obterDataLocalISO();
 
             if (chaveData < hojeData) {
                 mostrarAlerta('Não é possível agendar em datas passadas.');
@@ -1047,7 +1055,7 @@
             const hFim = document.getElementById('selectHoraFim').value;
             const semanasRecorrencia = parseInt(document.getElementById('selectRecorrencia').value) || 1;
             const chaveDataOriginal = getDataAtualChave();
-            const hojeData = new Date().toISOString().split('T')[0];
+            const hojeData = obterDataLocalISO();
 
             if (chaveDataOriginal < hojeData) {
                 mostrarAlerta('Não é possível agendar em datas passadas.');
@@ -1065,9 +1073,10 @@
             });
 
             for (let sem = 0; sem < semanasRecorrencia; sem++) {
-                const d = new Date(chaveDataOriginal + 'T00:00:00');
+                const [ano, mes, dia] = chaveDataOriginal.split('-').map(Number);
+                const d = new Date(ano, mes - 1, dia);
                 d.setDate(d.getDate() + (sem * 7));
-                const chaveDataAtual = d.toISOString().split('T')[0];
+                const chaveDataAtual = obterDataLocalISO(d);
 
                 slotsAfetados.forEach(slot => {
                     refReservas.child(chaveDataAtual).child(slot.replace(':', 'h')).set({
@@ -1242,7 +1251,7 @@
         }
 
         function ehHorarioPassado(horarioString, dataChave) {
-            const hojeData = new Date().toISOString().split('T')[0];
+            const hojeData = obterDataLocalISO();
             if (dataChave < hojeData) return true;
             if (dataChave > hojeData) return false;
 
@@ -1252,7 +1261,7 @@
         }
 
         function ehHorarioAtual(horarioString, dataChave) {
-            const hojeData = new Date().toISOString().split('T')[0];
+            const hojeData = obterDataLocalISO();
             if (dataChave !== hojeData) return false;
 
             const agoraHHMM = obterHorarioAtualHHMM();
@@ -1288,7 +1297,7 @@
             const tbody = document.getElementById('tabelaHorarios');
             tbody.innerHTML = '';
             const chaveData = getDataAtualChave();
-            const hojeData = new Date().toISOString().split('T')[0];
+            const hojeData = obterDataLocalISO();
             const reservasHoje = reservas[chaveData] || {};
             const ehDataPassada = chaveData < hojeData;
 
@@ -1423,19 +1432,20 @@
             
             tbody.innerHTML = '';
             
-            const dataBase = new Date(getDataAtualChave() + 'T00:00:00');
+            const [anoSel, mesSel, diaSel] = getDataAtualChave().split('-').map(Number);
+            const dataBase = new Date(anoSel, mesSel - 1, diaSel);
             const diaSemana = dataBase.getDay();
             const seg = new Date(dataBase);
             seg.setDate(dataBase.getDate() - (diaSemana === 0 ? 6 : diaSemana - 1));
 
             const diasSemanaInfo = [];
             const nomesDias = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'];
-            const hojeIso = new Date().toISOString().split('T')[0];
+            const hojeIso = obterDataLocalISO();
 
             for (let i = 0; i < 5; i++) {
                 const d = new Date(seg);
                 d.setDate(seg.getDate() + i);
-                const isoDate = d.toISOString().split('T')[0];
+                const isoDate = obterDataLocalISO(d);
                 diasSemanaInfo.push({
                     nome: nomesDias[i],
                     chaveData: isoDate,
@@ -1572,7 +1582,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const hoje = new Date().toISOString().split('T')[0];
+            const hoje = obterDataLocalISO();
             const inputDataElem = document.getElementById('inputData');
 
             inputDataElem.value = hoje;
